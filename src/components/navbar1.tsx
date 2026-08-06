@@ -1,6 +1,6 @@
 "use client";
 
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -26,6 +26,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 interface MenuItem {
   title: string;
@@ -81,6 +82,9 @@ const Navbar1 = ({
   },
   className,
 }: Navbar1Props) => {
+  // ২. useAuth থেকে user, loading এবং logout নিয়ে নিন
+  const { user, loading, logout } = useAuth();
+
   return (
     <section className={cn(" px-4 ", className)}>
       <div className="container px-4 mx-auto">
@@ -106,13 +110,32 @@ const Navbar1 = ({
               </NavigationMenu>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={auth.login.url}>{auth.login.title}</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href={auth.signup.url}>{auth.signup.title}</Link>
-            </Button>
+
+          {/* Desktop Auth Buttons */}
+          <div className="flex gap-2 items-center">
+            {loading ? (
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            ) : user ? (
+              // ইউজার লগইন করা থাকলে প্রোফাইল ও লগআউট বাটন দেখাবে
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/userprofile">Profile ({user.name})</Link>
+                </Button>
+                <Button variant="destructive" size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              // ইউজার লগইন করা না থাকলে লগইন ও সাইনআপ দেখাবে
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href={auth.login.url}>{auth.login.title}</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
 
@@ -154,13 +177,33 @@ const Navbar1 = ({
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
+                  {/* Mobile Auth Buttons */}
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <Link href={auth.login.url}>{auth.login.title}</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href={auth.signup.url}>{auth.signup.title}</Link>
-                    </Button>
+                    {loading ? (
+                      <span className="text-sm text-muted-foreground text-center">
+                        Loading...
+                      </span>
+                    ) : user ? (
+                      <>
+                        <Button asChild variant="outline">
+                          <Link href="/profile">Profile ({user.name})</Link>
+                        </Button>
+                        <Button variant="destructive" onClick={logout}>
+                          Logout
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button asChild variant="outline">
+                          <Link href={auth.login.url}>{auth.login.title}</Link>
+                        </Button>
+                        <Button asChild>
+                          <Link href={auth.signup.url}>
+                            {auth.signup.title}
+                          </Link>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
@@ -190,7 +233,6 @@ const renderMenuItem = (item: MenuItem) => {
 
   return (
     <NavigationMenuItem key={item.title}>
-      {/* asChild ব্যবহার করে সরাসরি Link পাস করা হয়েছে যাতে ডাবল <a> ট্যাগ না হয় */}
       <NavigationMenuLink asChild>
         <Link
           href={item.url}

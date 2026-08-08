@@ -72,8 +72,12 @@ const Navbar1 = ({
       url: "/media",
     },
     {
-      title: "Register",
-      url: "/register",
+      title: "Watchlist",
+      url: "/watchlist",
+    },
+    {
+      title: "Completed",
+      url: "/completed",
     },
   ],
   auth = {
@@ -82,7 +86,6 @@ const Navbar1 = ({
   },
   className,
 }: Navbar1Props) => {
-  // ২. useAuth থেকে user, loading এবং logout নিয়ে নিন
   const { user, loading, logout } = useAuth();
 
   return (
@@ -121,7 +124,14 @@ const Navbar1 = ({
                 <Button asChild variant="outline" size="sm">
                   <Link href="/userprofile">Profile ({user.name})</Link>
                 </Button>
-                <Button variant="destructive" size="sm" onClick={logout}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    logout();
+                    window.location.href = "/";
+                  }}
+                >
                   Logout
                 </Button>
               </>

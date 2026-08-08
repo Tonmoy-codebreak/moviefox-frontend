@@ -11,7 +11,7 @@ const ADMIN_ROUTES = [
   "/usermanage",
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
 
@@ -34,10 +34,13 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/user/:path*",
     "/watchlist/:path*",
     "/userprofile/:path*",
-    "/admin/:path*",
+    "/completed/:path*",
+    "/overview/:path*",
+    "/mediamanage/:path*",
+    "/reviewmanage/:path*",
+    "/usermanage/:path*",
     "/login",
     "/register",
   ],

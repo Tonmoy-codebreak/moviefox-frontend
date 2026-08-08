@@ -42,6 +42,7 @@ export default function MediaContainer({
 
   const movies = initialMovies;
 
+  //   Searchbar
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());

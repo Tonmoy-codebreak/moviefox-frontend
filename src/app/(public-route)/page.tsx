@@ -10,7 +10,7 @@ interface PageProps {
   }>;
 }
 
-export default async function MediaPage({ searchParams }: PageProps) {
+export default async function HomePage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const page = Number(resolvedParams.page) || 1;
   const limit = 10;

@@ -2,12 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface Movie {
   id: string;
   title: string;
-  description?: string;
-  poster?: string;
+  slug: string;
+  type: string;
+  access: string;
+  releaseYear: number;
+  posterUrl?: string;
+  avgRating: number;
+  ratingCount: number;
   createdAt?: string;
 }
 
@@ -42,7 +48,6 @@ export default function MediaContainer({
 
   const movies = initialMovies;
 
-  //   Searchbar
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
@@ -60,7 +65,6 @@ export default function MediaContainer({
     return () => clearTimeout(timer);
   }, [searchTerm, router, searchParams]);
 
-  //   Sorting option
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
@@ -73,7 +77,6 @@ export default function MediaContainer({
     router.push(`?${params.toString()}`);
   };
 
-  // Pagination handler
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
@@ -100,6 +103,8 @@ export default function MediaContainer({
           >
             <option value="createdAt">Sort by Date</option>
             <option value="title">Sort by Title</option>
+            <option value="releaseYear">Sort by Release Year</option>
+            <option value="avgRating">Sort by Rating</option>
           </select>
 
           <select
@@ -113,7 +118,7 @@ export default function MediaContainer({
         </div>
       </div>
 
-      {/* Movie Poster Card Grid Section */}
+      {/* Media Card Grid Section */}
       {movies.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
           <p className="text-gray-500 text-lg">
@@ -123,14 +128,16 @@ export default function MediaContainer({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {movies.map((movie) => (
-            <div
+            <Link
               key={movie.id}
-              className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+              href={`/media/${movie.id}`}
+              className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group cursor-pointer"
             >
-              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                {movie.poster ? (
+              {/* Poster & Badges Area */}
+              <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
+                {movie.posterUrl ? (
                   <img
-                    src={movie.poster}
+                    src={movie.posterUrl}
                     alt={movie.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -139,27 +146,38 @@ export default function MediaContainer({
                     No Poster
                   </div>
                 )}
-              </div>
 
-              <div className="p-4 flex flex-col flex-grow justify-between">
-                <div>
-                  <h2 className="font-bold text-lg text-gray-800 mb-1 line-clamp-1">
-                    {movie.title}
-                  </h2>
-                  <p className="text-gray-600 text-xs line-clamp-2">
-                    {movie.description ||
-                      "No description available for this media item."}
-                  </p>
+                {/* Top Badges: Access & Type */}
+                <div className="absolute top-3 left-3 flex gap-2">
+                  <span className="bg-black/70 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase">
+                    {movie.type}
+                  </span>
+                  <span
+                    className={`text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase ${movie.access === "FREE" ? "bg-green-600 text-white" : "bg-amber-500 text-white"}`}
+                  >
+                    {movie.access}
+                  </span>
                 </div>
 
-                {movie.createdAt && (
-                  <span className="text-[11px] text-gray-400 mt-4 block">
-                    Added:{" "}
-                    {new Date(movie.createdAt).toISOString().split("T")[0]}
-                  </span>
-                )}
+                {/* Rating Badge on Bottom-Right of Image */}
+                <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-yellow-400 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
+                  ⭐ {movie.avgRating.toFixed(1)}
+                </div>
               </div>
-            </div>
+
+              {/* Details Area */}
+              <div className="p-4 flex flex-col flex-grow justify-between">
+                <div>
+                  <div className="flex justify-between items-center text-xs text-gray-400 mb-1">
+                    <span>{movie.releaseYear}</span>
+                    <span>({movie.ratingCount} reviews)</span>
+                  </div>
+                  <h2 className="font-bold text-lg text-gray-800 line-clamp-1">
+                    {movie.title}
+                  </h2>
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       )}

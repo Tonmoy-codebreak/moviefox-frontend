@@ -19,7 +19,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   const sortOrder = resolvedParams.sortOrder || "desc";
 
   let movies = [];
-  let meta = { page: 1, limit: 10, total: 0, totalPages: 1 };
+  let meta = { page: 1, limit: 5, total: 0, totalPages: 1 };
 
   try {
     const res = await API.get("/media", {

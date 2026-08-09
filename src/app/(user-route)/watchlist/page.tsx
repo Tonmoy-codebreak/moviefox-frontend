@@ -1,6 +1,7 @@
 import { getWithAuth } from "@/lib/api-server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import RemoveFromWatchlist from "@/components/RemoveFromWatchlist";
 
 interface WatchlistItem {
   id: string;
@@ -21,11 +22,9 @@ export default async function WatchlistPage() {
   let watchlist: WatchlistItem[] = [];
 
   try {
-    // সার্ভার থেকে সরাসরি ডেটা ফেচ করছি
     const result = await getWithAuth("/watchlist/my-watchlist");
     watchlist = result?.data || [];
   } catch (error) {
-    // যদি টোকেন না থাকে বা ৪০১ এরর হয়, তবে লগইন পেজে পাঠিয়ে দিন
     console.error("Watchlist fetch error:", error);
     redirect("/login");
   }
@@ -38,7 +37,7 @@ export default async function WatchlistPage() {
             My Watchlist
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Manage your saved collection.
+            Manage your saved watchlist.
           </p>
         </div>
         <div className="bg-blue-50 text-blue-600 font-semibold px-4 py-2 rounded-xl text-sm">
@@ -61,33 +60,47 @@ export default async function WatchlistPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {watchlist.map((item) => (
-            <Link
+            <div
               key={item.id}
-              href={`/media/${item.media.id}`}
-              className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group cursor-pointer"
+              className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
             >
-              <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
-                {item.media.posterUrl ? (
-                  <img
-                    src={item.media.posterUrl}
-                    alt={item.media.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
-                    No Poster
-                  </div>
-                )}
+              <div>
+                <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
+                  {item.media.posterUrl ? (
+                    <img
+                      src={item.media.posterUrl}
+                      alt={item.media.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      No Poster
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 pb-2">
+                  <h2 className="font-bold text-lg text-gray-800 line-clamp-1">
+                    {item.media.title}
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    {item.media.releaseYear}
+                  </span>
+                </div>
               </div>
-              <div className="p-4">
-                <h2 className="font-bold text-lg text-gray-800 line-clamp-1">
-                  {item.media.title}
-                </h2>
-                <span className="text-xs text-gray-400">
-                  {item.media.releaseYear}
-                </span>
+
+              {/* Action Buttons Footer */}
+              <div className="p-4 pt-2 border-t border-gray-50 flex items-center gap-2">
+                <Link
+                  href={`/media/${item.media.id}`}
+                  className="flex-1 py-2 text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-xl transition-colors text-sm"
+                >
+                  More
+                </Link>
+                <div className="flex-1">
+                  <RemoveFromWatchlist mediaId={item.media.id} />
+                </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

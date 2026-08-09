@@ -37,7 +37,7 @@ export default function RemoveFromWatchlist({
         disabled={isPending}
         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors text-sm shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {isPending ? "Removing..." : "Remove 🗑️"}
+        {isPending ? "Removing..." : "Remove"}
       </button>
       {message && <p className="text-xs text-red-500">{message}</p>}
     </div>

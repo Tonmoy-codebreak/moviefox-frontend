@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
@@ -11,7 +12,7 @@ export async function removeFromWatchlistAction(mediaId: string) {
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
-    return { success: false, message: "Unauthorized: Please login first" };
+    redirect("/login");
   }
 
   try {

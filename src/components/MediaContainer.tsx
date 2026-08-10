@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { fetchMediaAction } from "@/actions/mediaContainer.action";
 
 interface Movie {
   id: string;
@@ -26,7 +27,7 @@ interface PaginationMeta {
 
 interface MediaContainerProps {
   initialMovies: Movie[];
-  meta: PaginationMeta;
+  initialMeta: PaginationMeta;
   currentSearch: string;
   currentSortBy: string;
   currentSortOrder: string;
@@ -34,20 +35,45 @@ interface MediaContainerProps {
 
 export default function MediaContainer({
   initialMovies,
-  meta,
+  initialMeta,
   currentSearch,
   currentSortBy,
   currentSortOrder,
 }: MediaContainerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  const [movies, setMovies] = useState<Movie[]>(initialMovies);
+  const [meta, setMeta] = useState<PaginationMeta>(initialMeta);
 
   const [searchTerm, setSearchTerm] = useState(currentSearch);
   const [sortBy, setSortBy] = useState(currentSortBy);
   const [sortOrder, setSortOrder] = useState(currentSortOrder);
 
-  const movies = initialMovies;
+  // ইউআরএল বা প্যারামিটার পরিবর্তনের সাথে সাথে ডেটা ফেচ করার লজিক
+  const loadMedia = async (
+    search: string,
+    sort: string,
+    order: string,
+    pageNum: string,
+  ) => {
+    startTransition(async () => {
+      const res = await fetchMediaAction({
+        searchTerm: search,
+        sortBy: sort,
+        sortOrder: order,
+        page: pageNum,
+      });
 
+      if (res.success) {
+        setMovies(res.data);
+        setMeta(res.meta);
+      }
+    });
+  };
+
+  // সার্চ বারে টাইপ করার সময় ডিবাউন্স করে ডেটা আপডেট করা
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
@@ -59,11 +85,12 @@ export default function MediaContainer({
       }
 
       params.set("page", "1");
-      router.push(`?${params.toString()}`);
+      router.push(`?${params.toString()}`, { scroll: false });
+      loadMedia(searchTerm, sortBy, sortOrder, "1");
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, router, searchParams]);
+  }, [searchTerm]);
 
   const handleSortChange = (newSortBy: string, newSortOrder: string) => {
     setSortBy(newSortBy);
@@ -74,13 +101,16 @@ export default function MediaContainer({
     params.set("sortOrder", newSortOrder);
     params.set("page", "1");
 
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
+    loadMedia(searchTerm, newSortBy, newSortOrder, "1");
   };
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    router.push(`?${params.toString()}`);
+
+    router.push(`?${params.toString()}`, { scroll: false });
+    loadMedia(searchTerm, sortBy, sortOrder, newPage.toString());
   };
 
   return (
@@ -118,6 +148,13 @@ export default function MediaContainer({
         </div>
       </div>
 
+      {/* Loading State Overlay */}
+      {isPending && (
+        <div className="text-center py-4 text-sm text-blue-600 font-medium animate-pulse">
+          Loading media...
+        </div>
+      )}
+
       {/* Media Card Grid Section */}
       {movies.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
@@ -153,15 +190,19 @@ export default function MediaContainer({
                     {movie.type}
                   </span>
                   <span
-                    className={`text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase ${movie.access === "FREE" ? "bg-green-600 text-white" : "bg-amber-500 text-white"}`}
+                    className={`text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase ${
+                      movie.access === "FREE"
+                        ? "bg-green-600 text-white"
+                        : "bg-amber-500 text-white"
+                    }`}
                   >
                     {movie.access}
                   </span>
                 </div>
 
-                {/* Rating Badge on Bottom-Right of Image */}
+                {/* Rating Badge */}
                 <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-yellow-400 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
-                  ⭐ {movie.avgRating.toFixed(1)}
+                  ⭐ {movie.avgRating ? movie.avgRating.toFixed(1) : "0.0"}
                 </div>
               </div>
 
@@ -187,7 +228,7 @@ export default function MediaContainer({
         <div className="flex gap-4 items-center justify-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mt-6">
           <button
             onClick={() => handlePageChange(meta.page - 1)}
-            disabled={meta.page === 1}
+            disabled={meta.page === 1 || isPending}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Previous
@@ -200,7 +241,7 @@ export default function MediaContainer({
 
           <button
             onClick={() => handlePageChange(meta.page + 1)}
-            disabled={meta.page === meta.totalPages}
+            disabled={meta.page === meta.totalPages || isPending}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Next

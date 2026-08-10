@@ -1,3 +1,4 @@
+import AddToCompleted from "@/components/AddToCompleted";
 import AddToWatchlist from "@/components/AddToWatchlist";
 import API from "@/lib/api";
 import { notFound } from "next/navigation";
@@ -103,7 +104,7 @@ export default async function MediaDetailsPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Action Links (Trailer & Streaming) & Watchlist Button */}
+            {/* Action Links (Trailer & Streaming) & Buttons */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               {media.trailerUrl && (
                 <a
@@ -128,6 +129,9 @@ export default async function MediaDetailsPage({ params }: PageProps) {
 
               {/* Add to Watchlist Button Component */}
               <AddToWatchlist mediaId={media.id} />
+
+              {/* Add to Completed Button Component with mediaId */}
+              <AddToCompleted mediaId={media.id} />
             </div>
           </div>
         </div>

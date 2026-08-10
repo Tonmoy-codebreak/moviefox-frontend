@@ -1,7 +1,109 @@
-import React from "react";
+import RemoveFromCompleted from "@/components/RemoveFromCompleted";
+import { getWithAuth } from "@/lib/api-server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-const CompletedPage = () => {
-  return <div>CompletedPage</div>;
-};
+interface CompletedMediaItem {
+  id: string;
+  media: {
+    id: string;
+    title: string;
+    slug: string;
+    type: string;
+    access: string;
+    releaseYear: number;
+    posterUrl?: string;
+    avgRating: number;
+  };
+  createdAt: string;
+}
 
-export default CompletedPage;
+export default async function CompletedPage() {
+  let completedList: CompletedMediaItem[] = [];
+
+  try {
+    const result = await getWithAuth("/completedmedia/my-list");
+    completedList = result?.data || [];
+  } catch (error) {
+    console.error("Completed media fetch error:", error);
+    redirect("/login");
+  }
+
+  return (
+    <main className="container mx-auto p-6 max-w-6xl space-y-6">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900">
+            Completed Media
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Browse through everything you have finished watching.
+          </p>
+        </div>
+        <div className="bg-green-50 text-green-600 font-semibold px-4 py-2 rounded-xl text-sm">
+          Total Completed: {completedList.length}
+        </div>
+      </div>
+
+      {completedList.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm space-y-3">
+          <p className="text-gray-500 text-lg">
+            You haven&apos;t completed any media yet.
+          </p>
+          <Link
+            href="/media"
+            className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors text-sm shadow-sm"
+          >
+            Explore Media 🎬
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {completedList.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+            >
+              <div>
+                <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
+                  {item.media.posterUrl ? (
+                    <img
+                      src={item.media.posterUrl}
+                      alt={item.media.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      No Poster
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 pb-2">
+                  <h2 className="font-bold text-lg text-gray-800 line-clamp-1">
+                    {item.media.title}
+                  </h2>
+                  <span className="text-xs text-gray-400">
+                    {item.media.releaseYear}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons Footer (Details & Remove side-by-side) */}
+              <div className="p-4 pt-2 border-t border-gray-50 flex items-center gap-2">
+                <Link
+                  href={`/media/${item.media.id}`}
+                  className="flex-1 py-2 text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-xl transition-colors text-sm"
+                >
+                  Details 🔍
+                </Link>
+                <div className="flex-1">
+                  <RemoveFromCompleted mediaId={item.media.id} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}

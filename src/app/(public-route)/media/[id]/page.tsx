@@ -1,5 +1,6 @@
 import AddToCompleted from "@/components/AddToCompleted";
 import AddToWatchlist from "@/components/AddToWatchlist";
+import ShowAllReview from "@/components/ShowAllReview";
 import API from "@/lib/api";
 import { notFound } from "next/navigation";
 
@@ -71,7 +72,11 @@ export default async function MediaDetailsPage({ params }: PageProps) {
                   {media.type}
                 </span>
                 <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full uppercase ${media.access === "FREE" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}
+                  className={`text-xs font-semibold px-3 py-1 rounded-full uppercase ${
+                    media.access === "FREE"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-amber-100 text-amber-700"
+                  }`}
                 >
                   {media.access} Access
                 </span>
@@ -95,7 +100,7 @@ export default async function MediaDetailsPage({ params }: PageProps) {
             <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center gap-6">
               <div>
                 <div className="text-3xl font-black text-gray-900 flex items-center gap-1">
-                  ⭐ {media.avgRating.toFixed(1)}{" "}
+                  ⭐ {media.avgRating ? media.avgRating.toFixed(1) : "0.0"}{" "}
                   <span className="text-sm font-normal text-gray-400">/ 5</span>
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">
@@ -143,6 +148,9 @@ export default async function MediaDetailsPage({ params }: PageProps) {
             Added on: {new Date(media.createdAt).toISOString().split("T")[0]}
           </span>
         </div>
+
+        {/* Show All Review Component with mediaId passed */}
+        <ShowAllReview mediaId={media.id} />
       </div>
     </main>
   );

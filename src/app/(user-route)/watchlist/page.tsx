@@ -1,6 +1,7 @@
 import { getWithAuth } from "@/lib/api-server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Bookmark, Star, Calendar, ArrowRight, Film } from "lucide-react";
 import RemoveFromWatchlist from "@/components/RemoveFromWatchlist";
 
 interface WatchlistItem {
@@ -18,8 +19,6 @@ interface WatchlistItem {
   createdAt: string;
 }
 
-const RIFT = ["#E23636", "#1687E8", "#FFD447", "#6C3FC5", "#F2298A"];
-
 export default async function WatchlistPage() {
   let watchlist: WatchlistItem[] = [];
 
@@ -32,184 +31,119 @@ export default async function WatchlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#111111]">
-      <div className="halftone-bg pointer-events-none fixed inset-0 opacity-[0.05]" />
-
-      <div className="relative container mx-auto p-6 max-w-6xl space-y-6">
-        <div className="relative bg-[#1a1a1a] p-6 rounded-2xl border-2 border-black shadow-[5px_5px_0_0_#1687E8] flex justify-between items-center overflow-hidden">
-          <div className="rift-seam absolute inset-x-0 top-0 h-[3px]" />
+    <main className="min-h-screen bg-[#FAFAFA]">
+      <div className="container mx-auto p-6 max-w-6xl space-y-8">
+        {/* Header */}
+        <div className="bg-black rounded-2xl px-7 py-8 flex justify-between items-center">
           <div>
-            <h1 className="rift-text text-3xl font-extrabold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight text-white">
               My Watchlist
             </h1>
-            <p className="text-[#F5F1E8]/50 text-sm mt-1">
+            <div className="h-[3px] w-10 bg-[#E23636] rounded-full mt-3 mb-3" />
+            <p className="text-white/50 text-sm">
               Manage your saved watchlist.
             </p>
           </div>
-          <div className="comic-chip">Total Saved: {watchlist.length}</div>
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-3xl font-bold text-[#F5C518]">
+              {watchlist.length}
+            </span>
+            <span className="text-xs uppercase tracking-wide text-white/40">
+              Saved titles
+            </span>
+          </div>
         </div>
 
         {watchlist.length === 0 ? (
-          <div className="text-center py-20 bg-[#1a1a1a] rounded-2xl border-2 border-black shadow-[5px_5px_0_0_#F2298A] space-y-4">
-            <p className="text-[#F5F1E8]/60 text-lg">
-              Your watchlist is currently empty.
-            </p>
+          <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 space-y-4">
+            <div className="mx-auto h-14 w-14 rounded-full bg-gray-100 flex items-center justify-center">
+              <Bookmark className="size-6 text-gray-400" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-gray-900 font-semibold text-lg">
+                Your watchlist is empty
+              </p>
+              <p className="text-gray-500 text-sm">
+                Titles you save will show up here.
+              </p>
+            </div>
             <Link
               href="/media"
-              className="comic-btn comic-btn--pink inline-block"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-[#E23636] text-white font-semibold rounded-lg transition-colors text-sm"
             >
               Explore media
+              <ArrowRight className="size-4" />
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {watchlist.map((item, index) => {
-              const accent = RIFT[index % RIFT.length];
-              return (
-                <div
-                  key={item.id}
-                  style={{ ["--card-shadow" as string]: accent }}
-                  className="watchlist-card group bg-[#1a1a1a] border-2 border-black rounded-xl overflow-hidden flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1"
-                >
-                  <div>
-                    <div className="relative w-full h-72 bg-[#0d0d0d] overflow-hidden">
-                      {item.media.posterUrl ? (
-                        <img
-                          src={item.media.posterUrl}
-                          alt={item.media.title}
-                          className="w-full h-full object-cover grayscale-[0.15] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#151515] text-[#F5F1E8]/30 text-sm">
-                          No poster
-                        </div>
-                      )}
-                      <div className="halftone-card pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+            {watchlist.map((item) => (
+              <div
+                key={item.id}
+                className="group bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-200 hover:border-gray-300 hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <div>
+                  <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
+                    {item.media.posterUrl ? (
+                      <img
+                        src={item.media.posterUrl}
+                        alt={item.media.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gray-100 text-gray-300">
+                        <Film className="size-8" />
+                        <span className="text-xs font-medium">No poster</span>
+                      </div>
+                    )}
 
-                      {typeof item.media.avgRating === "number" && (
-                        <div
-                          className="absolute top-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black text-[11px] font-extrabold text-[#111111]"
-                          style={{ backgroundColor: "#FFD447" }}
-                        >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    {typeof item.media.avgRating === "number" && (
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/80 backdrop-blur px-2 py-1">
+                        <Star className="size-3 fill-[#F5C518] text-[#F5C518]" />
+                        <span className="text-[11px] font-bold text-white">
                           {item.media.avgRating.toFixed(1)}
-                        </div>
-                      )}
-
-                      {item.media.type && (
-                        <span
-                          className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wide border-2 border-black text-[#111111]"
-                          style={{ backgroundColor: accent }}
-                        >
-                          {item.media.type}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
-                    <div className="p-4 pb-2">
-                      <h2 className="font-bold text-lg text-[#F5F1E8] line-clamp-1">
-                        {item.media.title}
-                      </h2>
-                      <span className="text-xs text-[#F5F1E8]/40">
-                        {item.media.releaseYear}
+                    {item.media.type && (
+                      <span className="absolute top-2.5 left-2.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-white/90 text-black">
+                        {item.media.type}
                       </span>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Action Buttons Footer */}
-                  <div className="p-4 pt-2 border-t border-white/10 flex items-center gap-2">
-                    <Link
-                      href={`/media/${item.media.id}`}
-                      className="comic-btn comic-btn--outline flex-1 text-center"
-                    >
-                      More
-                    </Link>
-                    <div className="flex-1">
-                      <RemoveFromWatchlist mediaId={item.media.id} />
-                    </div>
+                  <div className="p-4 pb-2">
+                    <h2 className="font-bold text-base text-gray-900 line-clamp-1">
+                      {item.media.title}
+                    </h2>
+                    <span className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                      <Calendar className="size-3" />
+                      {item.media.releaseYear}
+                    </span>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Action Buttons Footer */}
+                <div className="p-4 pt-2 border-t border-gray-100 flex items-center gap-2">
+                  <Link
+                    href={`/media/${item.media.id}`}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 text-center border border-gray-200 hover:border-black hover:bg-black hover:text-white text-gray-700 font-semibold rounded-lg transition-colors text-sm"
+                  >
+                    More
+                    <ArrowRight className="size-3.5" />
+                  </Link>
+                  <div className="flex-1">
+                    <RemoveFromWatchlist mediaId={item.media.id} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-
-      <style>{`
-        .rift-seam {
-          background: linear-gradient(90deg, #E23636, #FFD447, #1687E8, #6C3FC5, #F2298A, #E23636);
-          background-size: 200% 100%;
-          animation: riftShift 8s linear infinite;
-        }
-        .rift-text {
-          background: linear-gradient(90deg, #E23636, #F2298A, #6C3FC5, #1687E8, #FFD447);
-          background-size: 250% auto;
-          background-clip: text;
-          -webkit-background-clip: text;
-          color: transparent;
-          animation: riftShift 6s ease-in-out infinite;
-        }
-        @keyframes riftShift {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 200% 50%; }
-        }
-        .halftone-bg {
-          background-image: radial-gradient(rgba(245, 241, 232, 0.9) 1px, transparent 1px);
-          background-size: 16px 16px;
-        }
-        .halftone-card {
-          background-image: radial-gradient(rgba(255, 255, 255, 0.9) 1px, transparent 1px);
-          background-size: 8px 8px;
-        }
-        .comic-chip {
-          background: #FFD447;
-          color: #111111;
-          font-weight: 800;
-          font-size: 13px;
-          padding: 8px 16px;
-          border-radius: 10px;
-          border: 2px solid #111111;
-          box-shadow: 3px 3px 0 0 #E23636;
-        }
-        .watchlist-card {
-          box-shadow: 4px 4px 0 0 var(--card-shadow, #1687E8);
-        }
-        .watchlist-card:hover {
-          box-shadow: 6px 6px 0 0 var(--card-shadow, #1687E8);
-        }
-        .comic-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          text-transform: uppercase;
-          font-size: 12px;
-          letter-spacing: 0.04em;
-          padding: 8px 14px;
-          border-radius: 8px;
-          border: 2px solid #111111;
-          box-shadow: 3px 3px 0 0 var(--comic-shadow, #1687E8);
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
-          text-decoration: none;
-        }
-        .comic-btn:hover {
-          transform: translate(-1px, -1px);
-          box-shadow: 4px 4px 0 0 var(--comic-shadow, #1687E8);
-        }
-        .comic-btn:active {
-          transform: translate(2px, 2px);
-          box-shadow: 1px 1px 0 0 var(--comic-shadow, #1687E8);
-        }
-        .comic-btn--pink {
-          background: #F2298A;
-          color: #F5F1E8;
-          --comic-shadow: #6C3FC5;
-        }
-        .comic-btn--outline {
-          background: #F5F1E8;
-          color: #111111;
-          --comic-shadow: #E23636;
-        }
-      `}</style>
     </main>
   );
 }

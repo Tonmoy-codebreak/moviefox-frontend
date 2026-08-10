@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react";
 import {
   Menu,
-  X,
   User,
   LogOut,
   LogIn,
   UserPlus,
-  ChevronRight,
+  Home,
+  Film,
+  Bookmark,
+  CheckCircle2,
+  Circle,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Accordion,
@@ -36,6 +41,17 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+
+// Maps a menu title to a Lucide icon. Falls back to a plain dot for
+// any custom item that isn't one of the known routes.
+const ICONS: Record<string, LucideIcon> = {
+  Home: Home,
+  Media: Film,
+  Watchlist: Bookmark,
+  Completed: CheckCircle2,
+};
+
+const iconFor = (title: string) => ICONS[title] ?? Circle;
 
 interface MenuItem {
   title: string;
@@ -97,6 +113,7 @@ const Navbar1 = ({
 }: Navbar1Props) => {
   const { user, loading, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -112,11 +129,16 @@ const Navbar1 = ({
     return true;
   });
 
+  const isActive = (url: string) =>
+    url === "/"
+      ? pathname === "/"
+      : pathname === url || pathname?.startsWith(`${url}/`);
+
   return (
     <section
       className={cn(
-        "sticky top-0 z-50 px-4 transition-shadow duration-300 bg-white/95 backdrop-blur-md border-b border-gray-200",
-        scrolled ? "shadow-sm" : "shadow-none",
+        "sticky top-0 z-50 px-4 transition-shadow duration-300 bg-black border-b border-white/10",
+        scrolled ? "shadow-[0_4px_20px_-6px_rgba(0,0,0,0.6)]" : "shadow-none",
         className,
       )}
     >
@@ -126,8 +148,8 @@ const Navbar1 = ({
           <div className="flex items-center gap-10">
             {/* Logo */}
             <Link href={logo.url} className="flex items-center gap-2.5">
-              <img src={logo.src} className="max-h-7" alt={logo.alt} />
-              <span className="text-lg font-bold tracking-tight text-black">
+              <img src={logo.src} className="max-h-7 invert" alt={logo.alt} />
+              <span className="text-lg font-bold tracking-tight text-white">
                 {logo.title}
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-[#E23636]" />
@@ -135,7 +157,9 @@ const Navbar1 = ({
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList className="gap-1">
-                  {filteredMenu.map((item) => renderMenuItem(item))}
+                  {filteredMenu.map((item) =>
+                    renderMenuItem(item, isActive(item.url)),
+                  )}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
@@ -144,14 +168,14 @@ const Navbar1 = ({
           {/* Desktop Auth Buttons */}
           <div className="flex gap-3 items-center">
             {loading ? (
-              <span className="text-sm text-gray-400">Loading...</span>
+              <span className="text-sm text-white/40">Loading...</span>
             ) : user ? (
               <>
                 <Button
                   asChild
                   variant="outline"
                   size="sm"
-                  className="border-black text-black hover:bg-black hover:text-white gap-1.5"
+                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
                 >
                   <Link href="/userprofile">
                     <User className="size-4" />
@@ -160,7 +184,7 @@ const Navbar1 = ({
                 </Button>
                 <Button
                   size="sm"
-                  className="bg-black text-white hover:bg-[#E23636] gap-1.5"
+                  className="bg-[#E23636] text-white hover:bg-[#c92c2c] gap-1.5"
                   onClick={() => {
                     logout();
                     window.location.href = "/";
@@ -176,7 +200,7 @@ const Navbar1 = ({
                   asChild
                   variant="outline"
                   size="sm"
-                  className="border-black text-black hover:bg-black hover:text-white gap-1.5"
+                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
                 >
                   <Link href={auth.login.url}>
                     <LogIn className="size-4" />
@@ -186,7 +210,7 @@ const Navbar1 = ({
                 <Button
                   asChild
                   size="sm"
-                  className="bg-black text-white hover:bg-[#E23636] gap-1.5"
+                  className="bg-[#F5C518] text-black hover:bg-white gap-1.5 font-semibold"
                 >
                   <Link href={auth.signup.url}>
                     <UserPlus className="size-4" />
@@ -203,8 +227,8 @@ const Navbar1 = ({
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-7" alt={logo.alt} />
-              <span className="text-base font-bold tracking-tight text-black">
+              <img src={logo.src} className="max-h-7 invert" alt={logo.alt} />
+              <span className="text-base font-bold tracking-tight text-white">
                 {logo.title}
               </span>
             </Link>
@@ -213,17 +237,21 @@ const Navbar1 = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="border-black text-black hover:bg-black hover:text-white"
+                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black"
                 >
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto bg-white">
+              <SheetContent className="overflow-y-auto bg-black border-l border-white/10 text-white">
                 <SheetHeader>
                   <SheetTitle>
                     <Link href={logo.url} className="flex items-center gap-2">
-                      <img src={logo.src} className="max-h-7" alt={logo.alt} />
-                      <span className="text-base font-bold tracking-tight text-black">
+                      <img
+                        src={logo.src}
+                        className="max-h-7 invert"
+                        alt={logo.alt}
+                      />
+                      <span className="text-base font-bold tracking-tight text-white">
                         {logo.title}
                       </span>
                     </Link>
@@ -235,13 +263,15 @@ const Navbar1 = ({
                     collapsible
                     className="flex w-full flex-col gap-4"
                   >
-                    {filteredMenu.map((item) => renderMobileMenuItem(item))}
+                    {filteredMenu.map((item) =>
+                      renderMobileMenuItem(item, isActive(item.url)),
+                    )}
                   </Accordion>
 
                   {/* Mobile Auth Buttons */}
                   <div className="flex flex-col gap-3">
                     {loading ? (
-                      <span className="text-sm text-gray-400 text-center">
+                      <span className="text-sm text-white/40 text-center">
                         Loading...
                       </span>
                     ) : user ? (
@@ -249,7 +279,7 @@ const Navbar1 = ({
                         <Button
                           asChild
                           variant="outline"
-                          className="border-black text-black hover:bg-black hover:text-white gap-1.5"
+                          className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
                         >
                           <Link href="/userprofile">
                             <User className="size-4" />
@@ -257,7 +287,7 @@ const Navbar1 = ({
                           </Link>
                         </Button>
                         <Button
-                          className="bg-black text-white hover:bg-[#E23636] gap-1.5"
+                          className="bg-[#E23636] text-white hover:bg-[#c92c2c] gap-1.5"
                           onClick={logout}
                         >
                           <LogOut className="size-4" />
@@ -269,7 +299,7 @@ const Navbar1 = ({
                         <Button
                           asChild
                           variant="outline"
-                          className="border-black text-black hover:bg-black hover:text-white gap-1.5"
+                          className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
                         >
                           <Link href={auth.login.url}>
                             <LogIn className="size-4" />
@@ -278,7 +308,7 @@ const Navbar1 = ({
                         </Button>
                         <Button
                           asChild
-                          className="bg-black text-white hover:bg-[#E23636] gap-1.5"
+                          className="bg-[#F5C518] text-black hover:bg-white gap-1.5 font-semibold"
                         >
                           <Link href={auth.signup.url}>
                             <UserPlus className="size-4" />
@@ -298,14 +328,17 @@ const Navbar1 = ({
   );
 };
 
-const renderMenuItem = (item: MenuItem) => {
+const renderMenuItem = (item: MenuItem, active: boolean) => {
+  const Icon = iconFor(item.title);
+
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="bg-transparent text-gray-700 hover:text-black data-[state=open]:text-black text-sm font-medium">
+        <NavigationMenuTrigger className="bg-transparent text-white/80 hover:text-[#F5C518] data-[state=open]:text-[#F5C518] text-sm font-medium gap-1.5">
+          <Icon className="size-4" />
           {item.title}
         </NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-white text-black border border-gray-200">
+        <NavigationMenuContent className="bg-black text-white border border-white/10">
           {item.items.map((subItem) => (
             <NavigationMenuLink asChild key={subItem.title} className="w-80">
               <SubMenuLink item={subItem} />
@@ -321,21 +354,35 @@ const renderMenuItem = (item: MenuItem) => {
       <NavigationMenuLink asChild>
         <Link
           href={item.url}
-          className="group relative inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-black"
+          className={cn(
+            "group relative inline-flex h-10 w-max items-center justify-center gap-1.5 rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors",
+            active ? "text-white" : "text-white/70 hover:text-[#F5C518]",
+          )}
         >
+          <Icon className="size-4" />
           {item.title}
-          <span className="pointer-events-none absolute left-4 right-4 -bottom-0.5 h-[2px] origin-left scale-x-0 bg-[#E23636] transition-transform duration-200 group-hover:scale-x-100" />
+          <span
+            className={cn(
+              "pointer-events-none absolute left-4 right-4 -bottom-0.5 h-[2px] origin-left bg-[#E23636] transition-transform duration-200",
+              active
+                ? "scale-x-100"
+                : "scale-x-0 group-hover:scale-x-100 group-hover:bg-white/30",
+            )}
+          />
         </Link>
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
 };
 
-const renderMobileMenuItem = (item: MenuItem) => {
+const renderMobileMenuItem = (item: MenuItem, active: boolean) => {
+  const Icon = iconFor(item.title);
+
   if (item.items) {
     return (
       <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold text-black hover:no-underline hover:text-[#E23636]">
+        <AccordionTrigger className="text-md py-0 font-semibold text-white hover:no-underline hover:text-[#F5C518] gap-2">
+          <Icon className="size-4" />
           {item.title}
         </AccordionTrigger>
         <AccordionContent className="mt-2">
@@ -351,10 +398,15 @@ const renderMobileMenuItem = (item: MenuItem) => {
     <Link
       key={item.title}
       href={item.url}
-      className="group flex items-center justify-between text-md font-semibold text-black hover:text-[#E23636] transition-colors"
+      className={cn(
+        "flex items-center gap-2 text-md font-semibold transition-colors border-l-2 pl-3 -ml-3.5",
+        active
+          ? "text-white border-[#E23636]"
+          : "text-white/70 border-transparent hover:text-[#F5C518]",
+      )}
     >
+      <Icon className="size-4" />
       {item.title}
-      <ChevronRight className="size-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#E23636]" />
     </Link>
   );
 };
@@ -362,14 +414,14 @@ const renderMobileMenuItem = (item: MenuItem) => {
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
     <Link
-      className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-gray-50"
+      className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-white/5"
       href={item.url}
     >
-      <div className="text-[#E23636]">{item.icon}</div>
+      <div className="text-[#F5C518]">{item.icon}</div>
       <div>
-        <div className="text-sm font-semibold text-black">{item.title}</div>
+        <div className="text-sm font-semibold text-white">{item.title}</div>
         {item.description && (
-          <p className="text-sm leading-snug text-gray-500">
+          <p className="text-sm leading-snug text-white/50">
             {item.description}
           </p>
         )}

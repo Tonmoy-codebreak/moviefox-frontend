@@ -61,7 +61,7 @@ interface Navbar1Props {
 const Navbar1 = ({
   logo = {
     url: "/",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
+    src: "https://www.svgrepo.com/show/418955/cinema-film-movie.svg",
     alt: "logo",
     title: "Moviefox",
   },
@@ -88,6 +88,13 @@ const Navbar1 = ({
 }: Navbar1Props) => {
   const { user, loading, logout } = useAuth();
 
+  const filteredMenu = menu.filter((item) => {
+    if (!user && (item.title === "Watchlist" || item.title === "Completed")) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <section className={cn(" px-4 ", className)}>
       <div className="container px-4 mx-auto">
@@ -96,11 +103,7 @@ const Navbar1 = ({
           <div className="flex items-center gap-6">
             {/* Logo */}
             <Link href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
+              <img src={logo.src} className="max-h-8 " alt={logo.alt} />
               <span className="text-lg font-semibold tracking-tighter">
                 {logo.title}
               </span>
@@ -108,7 +111,7 @@ const Navbar1 = ({
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
+                  {filteredMenu.map((item) => renderMenuItem(item))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
@@ -119,7 +122,6 @@ const Navbar1 = ({
             {loading ? (
               <span className="text-sm text-muted-foreground">Loading...</span>
             ) : user ? (
-              // ইউজার লগইন করা থাকলে প্রোফাইল ও লগআউট বাটন দেখাবে
               <>
                 <Button asChild variant="outline" size="sm">
                   <Link href="/userprofile">Profile ({user.name})</Link>
@@ -136,7 +138,6 @@ const Navbar1 = ({
                 </Button>
               </>
             ) : (
-              // ইউজার লগইন করা না থাকলে লগইন ও সাইনআপ দেখাবে
               <>
                 <Button asChild variant="outline" size="sm">
                   <Link href={auth.login.url}>{auth.login.title}</Link>
@@ -184,7 +185,7 @@ const Navbar1 = ({
                     collapsible
                     className="flex w-full flex-col gap-4"
                   >
-                    {menu.map((item) => renderMobileMenuItem(item))}
+                    {filteredMenu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
                   {/* Mobile Auth Buttons */}
@@ -196,7 +197,7 @@ const Navbar1 = ({
                     ) : user ? (
                       <>
                         <Button asChild variant="outline">
-                          <Link href="/profile">Profile ({user.name})</Link>
+                          <Link href="/userprofile">Profile ({user.name})</Link>
                         </Button>
                         <Button variant="destructive" onClick={logout}>
                           Logout

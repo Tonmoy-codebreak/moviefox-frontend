@@ -31,10 +31,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (token) {
         try {
           const response = await API.get("/auth/profile");
-          setUser(response.data.data);
+          const fetchedUser = response.data.data;
+          setUser(fetchedUser);
+          Cookies.set("role", fetchedUser.role, { expires: 7 });
         } catch (error) {
           console.error("Failed to fetch user profile", error);
           Cookies.remove("token");
+          Cookies.remove("role");
           setUser(null);
         }
       }
@@ -46,11 +49,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = (token: string, userData: User) => {
     Cookies.set("token", token, { expires: 7 });
+    Cookies.set("role", userData.role, { expires: 7 });
     setUser(userData);
   };
 
   const logout = () => {
     Cookies.remove("token");
+    Cookies.remove("role");
     setUser(null);
   };
 

@@ -1,9 +1,14 @@
+"use client";
+
 import {
-  BarChart3,
-  ClipboardList,
-  HelpCircle,
+  Film,
+  FilmIcon,
+  FolderPlus,
   LayoutDashboard,
-  Settings,
+  LogOut,
+  ShieldCheck,
+  Tags,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -34,6 +39,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 type NavItem = {
   label: string;
@@ -54,8 +60,9 @@ type SidebarData = {
     title: string;
     description: string;
   };
+  topItem: NavItem;
   navGroups: NavGroup[];
-  footerGroup: NavGroup;
+  footerItems: NavItem[];
 };
 
 const sidebarData: SidebarData = {
@@ -65,29 +72,37 @@ const sidebarData: SidebarData = {
     title: "Admin",
     description: "Dashboard",
   },
+  topItem: {
+    label: "Overview",
+    icon: LayoutDashboard,
+    href: "/overview",
+    isActive: true,
+  },
   navGroups: [
     {
-      title: "Actions",
+      title: "Manage Media",
       items: [
+        { label: "All Media", icon: Film, href: "/mediamanage" },
+        { label: "Add Media", icon: FolderPlus, href: "/mediamanage/add" },
+        { label: "Genres", icon: Tags, href: "/mediamanage/genres" },
+      ],
+    },
+    {
+      title: "Manage Users",
+      items: [
+        { label: "Users", icon: Users, href: "/usermanage" },
         {
-          label: "Overview",
-          icon: LayoutDashboard,
-          href: "/overview",
-          isActive: true,
+          label: "Pending Reviews",
+          icon: FilmIcon,
+          href: "/reviewmanage/pending",
         },
-        { label: "Media Manage", icon: ClipboardList, href: "/mediamanage" },
-        { label: "User Manage", icon: BarChart3, href: "/usermanage" },
-        { label: "Review Manage", icon: BarChart3, href: "/reviewmanage" },
       ],
     },
   ],
-  footerGroup: {
-    title: "Support",
-    items: [
-      { label: "Help Center", icon: HelpCircle, href: "#" },
-      { label: "Settings", icon: Settings, href: "#" },
-    ],
-  },
+  footerItems: [
+    { label: "Admin Panel", icon: ShieldCheck, href: "/admin" },
+    { label: "Log out", icon: LogOut, href: "/logout" },
+  ],
 };
 
 const SidebarLogo = ({ logo }: { logo: SidebarData["logo"] }) => {
@@ -115,12 +130,34 @@ const SidebarLogo = ({ logo }: { logo: SidebarData["logo"] }) => {
 };
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const TopIcon = sidebarData.topItem.icon;
+  const { logout } = useAuth();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarLogo logo={sidebarData.logo} />
       </SidebarHeader>
       <SidebarContent>
+        {/* Top-level Overview item, outside any group */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={sidebarData.topItem.isActive}
+                >
+                  <Link href={sidebarData.topItem.href}>
+                    <TopIcon />
+                    <span>{sidebarData.topItem.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {sidebarData.navGroups.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
@@ -146,11 +183,29 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarGroup>
-          <SidebarGroupLabel>{sidebarData.footerGroup.title}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {sidebarData.footerGroup.items.map((item) => {
+              {sidebarData.footerItems.map((item) => {
                 const Icon = item.icon;
+
+                // যদি আইটেমটি "Log out" হয়, তবে লিঙ্কের বদলে বাটন দিয়ে হ্যান্ডেল করব
+                if (item.label === "Log out") {
+                  return (
+                    <SidebarMenuItem key={item.label}>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          logout();
+                          window.location.href = "/login";
+                        }}
+                        className="cursor-pointer text-red-500 hover:text-red-600"
+                      >
+                        <Icon />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 return (
                   <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton asChild>

@@ -82,19 +82,19 @@ const sidebarData: SidebarData = {
     {
       title: "Manage Media",
       items: [
-        { label: "All Media", icon: Film, href: "/mediamanage" },
-        { label: "Add Media", icon: FolderPlus, href: "/mediamanage/add" },
-        { label: "Genres", icon: Tags, href: "/mediamanage/genres" },
+        { label: "All Media", icon: Film, href: "/allmedia" },
+        { label: "Add Media", icon: FolderPlus, href: "/addnewmedia" },
+        { label: "Genres", icon: Tags, href: "/genres" },
       ],
     },
     {
       title: "Manage Users",
       items: [
-        { label: "Users", icon: Users, href: "/usermanage" },
+        { label: "Users", icon: Users, href: "/users" },
         {
           label: "Pending Reviews",
           icon: FilmIcon,
-          href: "/reviewmanage/pending",
+          href: "/pendingreviews",
         },
       ],
     },

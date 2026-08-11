@@ -26,11 +26,15 @@ export default function UserProfilePage() {
     );
   }
 
+  const formattedDate = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString()
+    : "N/A";
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-card rounded-xl shadow-md border border-border mt-8">
       <div className="flex items-center gap-4 border-b border-border pb-6 mb-6">
         <div className="w-16 h-16 bg-primary/10 text-primary flex items-center justify-center rounded-full text-2xl font-bold">
-          {user.name.charAt(0).toUpperCase()}
+          {user.name ? user.name.charAt(0).toUpperCase() : "U"}
         </div>
         <div>
           <h1 className="text-2xl font-bold">{user.name}</h1>
@@ -70,9 +74,7 @@ export default function UserProfilePage() {
             <Calendar className="w-5 h-5" />
             <span className="text-sm font-medium">Joined Date</span>
           </div>
-          <span className="font-semibold text-foreground">
-            {new Date(user.createdAt).toLocaleDateString()}
-          </span>
+          <span className="font-semibold text-foreground">{formattedDate}</span>
         </div>
       </div>
     </div>

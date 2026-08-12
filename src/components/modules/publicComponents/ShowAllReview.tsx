@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchReviewsByMediaAction } from "@/actions/showAllReview.action";
+import { fetchReviewsByMediaAction } from "@/actions/publicAction/showAllReview.action";
 import {
   Star,
   User,

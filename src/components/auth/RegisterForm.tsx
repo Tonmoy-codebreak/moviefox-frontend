@@ -1,6 +1,6 @@
 "use client";
 
-import { registerAction } from "@/actions/registerForm.action";
+import { registerAction } from "@/actions/publicAction/registerForm.action";
 import Link from "next/link";
 import { useActionState } from "react";
 

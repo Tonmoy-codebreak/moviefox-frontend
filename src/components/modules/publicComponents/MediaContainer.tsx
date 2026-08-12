@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { fetchMediaAction } from "@/actions/mediaContainer.action";
+import { fetchMediaAction } from "@/actions/publicAction/mediaContainer.action";
 
 interface Movie {
   id: string;

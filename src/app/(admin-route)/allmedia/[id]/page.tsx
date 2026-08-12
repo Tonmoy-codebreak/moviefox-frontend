@@ -1,7 +1,19 @@
+import MediaInfoForAdmin from "@/components/modules/adminComponents/MediaInfoForAdmin";
 import React from "react";
 
-const allmediainfo = () => {
-  return <div>allmediainfo</div>;
+type Props = {
+  params: Promise<{ id: string }>;
 };
 
-export default allmediainfo;
+const mediainfo = async ({ params }: Props) => {
+  const resolvedParams = await params;
+  const mediaId = resolvedParams.id;
+
+  return (
+    <div className="p-6">
+      <MediaInfoForAdmin id={mediaId} />
+    </div>
+  );
+};
+
+export default mediainfo;

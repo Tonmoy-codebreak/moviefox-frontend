@@ -1,7 +1,12 @@
+import AllMediaForAdmin from "@/components/modules/adminComponents/AllMediaForAdmin";
 import React from "react";
 
 const allmediapage = () => {
-  return <div>allmediapage</div>;
+  return (
+    <div>
+      <AllMediaForAdmin></AllMediaForAdmin>
+    </div>
+  );
 };
 
 export default allmediapage;

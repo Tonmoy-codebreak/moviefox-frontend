@@ -1,31 +1,30 @@
 "use client";
 
 import {
-  addToCompletedAction,
-  checkIfInCompleted,
-} from "@/actions/addToCompleted.action";
+  addToWatchlistAction,
+  checkIfInWatchlist,
+} from "@/actions/userAction/addtoWatchlist.action";
 import { useState, useEffect, useTransition } from "react";
 
-interface AddToCompletedProps {
+interface AddToWatchlistProps {
   mediaId: string;
 }
 
-export default function AddToCompleted({ mediaId }: AddToCompletedProps) {
+export default function AddToWatchlist({ mediaId }: AddToWatchlistProps) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 
-  // কম্পোনেন্ট মাউন্ট হওয়ার সাথে সাথে চেক করবে এটি কমপ্লিটেড লিস্টে আছে কিনা
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const exists = await checkIfInCompleted(mediaId);
+        const exists = await checkIfInWatchlist(mediaId);
         if (exists) {
           setIsSuccess(true);
         }
       } catch (error) {
-        console.error("Error checking completed status", error);
+        console.error("Error checking watchlist status", error);
       } finally {
         setIsChecking(false);
       }
@@ -34,13 +33,13 @@ export default function AddToCompleted({ mediaId }: AddToCompletedProps) {
     checkStatus();
   }, [mediaId]);
 
-  const handleAddToCompleted = () => {
+  const handleAddToWatchlist = () => {
     startTransition(async () => {
-      const result = await addToCompletedAction(mediaId);
+      const result = await addToWatchlistAction(mediaId);
 
       if (result.success) {
         setIsSuccess(true);
-        setMessage("Marked as Completed! 🎉");
+        setMessage("Added to Watchlist! 🎉");
       } else {
         setMessage(result.message || "Something went wrong!");
       }
@@ -50,7 +49,7 @@ export default function AddToCompleted({ mediaId }: AddToCompletedProps) {
   return (
     <div className="flex flex-col gap-1">
       <button
-        onClick={handleAddToCompleted}
+        onClick={handleAddToWatchlist}
         disabled={isPending || isSuccess || isChecking}
         className={`px-5 py-2.5 font-medium rounded-xl transition-colors text-sm shadow-sm flex items-center justify-center gap-2 ${
           isSuccess
@@ -61,10 +60,10 @@ export default function AddToCompleted({ mediaId }: AddToCompletedProps) {
         {isChecking
           ? "Checking..."
           : isPending
-            ? "Saving..."
+            ? "Adding..."
             : isSuccess
-              ? "Completed ✓"
-              : "Mark as Completed 🎯"}
+              ? "In Watchlist ✓"
+              : "Add to Watchlist 🔖"}
       </button>
       {message && (
         <p

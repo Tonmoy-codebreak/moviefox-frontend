@@ -1,5 +1,5 @@
-import MediaContainer from "@/components/MediaContainer";
-import { fetchMediaAction } from "@/actions/mediaContainer.action";
+import MediaContainer from "@/components/modules/publicComponents/MediaContainer";
+import { fetchMediaAction } from "@/actions/publicAction/mediaContainer.action";
 
 interface PageProps {
   searchParams: Promise<{

@@ -1,24 +1,29 @@
 "use client";
 
-import { removeFromCompletedAction } from "@/actions/removeFromCompleted.action";
+import { removeFromWatchlistAction } from "@/actions/userAction/removeFromWatchlist.action";
 import { useState, useTransition } from "react";
 
-interface RemoveFromCompletedProps {
+interface RemoveFromWatchlistProps {
   mediaId: string;
+  onRemoved?: () => void;
 }
 
-export default function RemoveFromCompleted({
+export default function RemoveFromWatchlist({
   mediaId,
-}: RemoveFromCompletedProps) {
+  onRemoved,
+}: RemoveFromWatchlistProps) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
 
   const handleRemove = () => {
     startTransition(async () => {
-      const result = await removeFromCompletedAction(mediaId);
+      const result = await removeFromWatchlistAction(mediaId);
 
       if (result.success) {
         setMessage("Removed! 🗑️");
+        if (onRemoved) {
+          onRemoved();
+        }
       } else {
         setMessage(result.message || "Something went wrong!");
       }
@@ -32,7 +37,7 @@ export default function RemoveFromCompleted({
         disabled={isPending}
         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors text-sm shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {isPending ? "Removing..." : "Remove 🗑️"}
+        {isPending ? "Removing..." : "Remove"}
       </button>
       {message && <p className="text-xs text-red-500">{message}</p>}
     </div>

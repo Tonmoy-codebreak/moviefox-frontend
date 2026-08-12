@@ -1,6 +1,6 @@
-import AddToCompleted from "@/components/AddToCompleted";
-import AddToWatchlist from "@/components/AddToWatchlist";
-import ShowAllReview from "@/components/ShowAllReview";
+import AddToCompleted from "@/components/modules/userComponents/AddToCompleted";
+import AddToWatchlist from "@/components/modules/userComponents/AddToWatchlist";
+import ShowAllReview from "@/components/modules/publicComponents/ShowAllReview";
 import API from "@/lib/api";
 import { notFound } from "next/navigation";
 

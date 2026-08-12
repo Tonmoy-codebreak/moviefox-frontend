@@ -2,7 +2,7 @@ import { getWithAuth } from "@/lib/api-server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Bookmark, Star, Calendar, ArrowRight, Film } from "lucide-react";
-import RemoveFromWatchlist from "@/components/RemoveFromWatchlist";
+import RemoveFromWatchlist from "@/components/modules/userComponents/RemoveFromWatchlist";
 
 interface WatchlistItem {
   id: string;

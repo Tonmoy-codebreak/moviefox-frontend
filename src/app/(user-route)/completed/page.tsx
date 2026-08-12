@@ -1,4 +1,4 @@
-import RemoveFromCompleted from "@/components/RemoveFromCompleted";
+import RemoveFromCompleted from "@/components/modules/userComponents/RemoveFromCompleted";
 import { getWithAuth } from "@/lib/api-server";
 import Link from "next/link";
 import { redirect } from "next/navigation";

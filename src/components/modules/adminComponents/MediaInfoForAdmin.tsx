@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { getSingleMediaForAdmin } from "@/actions/adminAction/mediaInfoForAdmin.action";
 
 type Props = {
@@ -22,7 +23,35 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      {/* Poster Section */}
+      {/* Top Header with Edit Button */}
+      <div className="flex justify-between items-center bg-white p-6 border border-gray-200 rounded-2xl shadow-sm">
+        <div>
+          <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
+            {media.type || "N/A"}
+          </span>
+          <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full ml-2">
+            {media.access || "N/A"}
+          </span>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+            {media.title}
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">
+            Slug:{" "}
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+              {media.slug || "N/A"}
+            </code>
+          </p>
+        </div>
+
+        <Link
+          href={`/allmedia/${media.id}/edit`}
+          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+        >
+          ✏️ Edit Media
+        </Link>
+      </div>
+
+      {/* Poster & Main Info Section */}
       <div className="flex flex-col md:flex-row gap-6 bg-white p-6 border border-gray-200 rounded-2xl shadow-sm">
         <div className="w-full md:w-1/3 flex-shrink-0">
           <img
@@ -33,25 +62,6 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
         </div>
 
         <div className="flex-1 space-y-4">
-          <div>
-            <div className="flex flex-wrap gap-2 mb-2">
-              <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
-                {media.type || "N/A"}
-              </span>
-              <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full">
-                {media.access || "N/A"}
-              </span>
-            </div>
-
-            <h1 className="text-3xl font-bold text-gray-900">{media.title}</h1>
-            <p className="text-sm text-gray-400 mt-1">
-              Slug:{" "}
-              <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                {media.slug || "N/A"}
-              </code>
-            </p>
-          </div>
-
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2 text-sm">
             <div>
               <span className="text-gray-400 block text-xs">Release Year</span>
@@ -59,6 +69,7 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
                 {media.releaseYear || "N/A"}
               </span>
             </div>
+
             <div>
               <span className="text-gray-400 block text-xs">Is Published</span>
               <span
@@ -67,6 +78,7 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
                 {String(media.isPublished ?? "N/A")}
               </span>
             </div>
+
             <div>
               <span className="text-gray-400 block text-xs">Is Featured</span>
               <span className="font-semibold text-gray-700">
@@ -83,12 +95,14 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
                 {media.avgRating ?? 0} ⭐
               </span>
             </div>
+
             <div className="bg-gray-50 p-3 rounded-xl border">
               <span className="text-gray-400 block text-xs">Rating Count</span>
               <span className="font-bold text-lg text-gray-800">
                 {media.ratingCount ?? 0}
               </span>
             </div>
+
             <div className="bg-gray-50 p-3 rounded-xl border">
               <span className="text-gray-400 block text-xs">Review Count</span>
               <span className="font-bold text-lg text-gray-800">
@@ -104,6 +118,7 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
         <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
           Streaming & Links
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="p-3 bg-gray-50 border rounded-xl">
             <span className="text-gray-400 block text-xs font-semibold uppercase">
@@ -152,29 +167,32 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-400 block text-xs">Media ID</span>
-            <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded">
+            <span className="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded block mt-1">
               {media.id}
             </span>
           </div>
+
           <div>
             <span className="text-gray-400 block text-xs">Created At</span>
-            <span className="font-medium text-gray-700">
+            <span className="font-medium text-gray-700 block mt-1">
               {media.createdAt
                 ? new Date(media.createdAt).toLocaleString()
                 : "N/A"}
             </span>
           </div>
+
           <div>
             <span className="text-gray-400 block text-xs">Updated At</span>
-            <span className="font-medium text-gray-700">
+            <span className="font-medium text-gray-700 block mt-1">
               {media.updatedAt
                 ? new Date(media.updatedAt).toLocaleString()
                 : "N/A"}
             </span>
           </div>
+
           <div>
             <span className="text-gray-400 block text-xs">Deleted At</span>
-            <span className="font-medium text-red-500">
+            <span className="font-medium text-red-500 block mt-1">
               {media.deletedAt
                 ? new Date(media.deletedAt).toLocaleString()
                 : "Active (Null)"}

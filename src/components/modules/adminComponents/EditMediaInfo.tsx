@@ -8,6 +8,7 @@ type Media = {
   id: string | number;
   title?: string;
   slug?: string;
+  description?: string;
   type?: string;
   access?: string;
   releaseYear?: number | string | null;
@@ -32,6 +33,7 @@ const EditMediaInfo = ({ media }: Props) => {
   const [formData, setFormData] = useState({
     title: media.title || "",
     slug: media.slug || "",
+    description: media.description || "",
     type: media.type || "",
     access: media.access || "",
     releaseYear: media.releaseYear || "",
@@ -43,7 +45,9 @@ const EditMediaInfo = ({ media }: Props) => {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value, type } = e.target;
 
@@ -123,6 +127,21 @@ const EditMediaInfo = ({ media }: Props) => {
             onChange={handleChange}
             className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
             required
+          />
+        </div>
+
+        {/* ডেসক্রিপশন ফিল্ড (পুরো রো জুড়ে থাকবে) */}
+        <div className="md:col-span-2">
+          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+            Description
+          </label>
+          <textarea
+            name="description"
+            rows={4}
+            value={formData.description}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            placeholder="Write media description..."
           />
         </div>
 

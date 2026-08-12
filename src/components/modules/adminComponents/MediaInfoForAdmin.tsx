@@ -85,6 +85,12 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
                 {String(media.isFeatured ?? "N/A")}
               </span>
             </div>
+            <div>
+              <span className="text-gray-400 block text-xs">Description</span>
+              <span className="font-semibold text-gray-700">
+                {String(media.description ?? "N/A")}
+              </span>
+            </div>
           </div>
 
           {/* rating review count */}

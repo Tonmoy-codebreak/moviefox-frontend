@@ -10,6 +10,7 @@ const ADMIN_ROUTES = [
   "/genres",
   "/pendingreviews",
   "/users",
+  "/adminprofile",
 ];
 
 export function proxy(request: NextRequest) {

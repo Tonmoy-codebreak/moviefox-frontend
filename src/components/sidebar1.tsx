@@ -100,7 +100,7 @@ const sidebarData: SidebarData = {
     },
   ],
   footerItems: [
-    { label: "Admin Panel", icon: ShieldCheck, href: "/admin" },
+    { label: "Admin Profile", icon: ShieldCheck, href: "/adminprofile" },
     { label: "Log out", icon: LogOut, href: "/logout" },
   ],
 };
@@ -250,7 +250,7 @@ const Sidebar1 = ({ className, children }: Sidebar1Props) => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  <BreadcrumbPage>lolboard</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

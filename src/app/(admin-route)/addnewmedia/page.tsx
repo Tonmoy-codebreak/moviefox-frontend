@@ -1,7 +1,17 @@
+import { getAllGenresAction } from "@/actions/adminAction/showAllGenres.action";
+import AddNewMedia from "@/components/modules/adminComponents/AddNewMedia";
+
 import React from "react";
 
-const addnewmediaPage = () => {
-  return <div>addnewmediaPage</div>;
+const AddNewMediaPage = async () => {
+  const res = await getAllGenresAction();
+  const allGenres = res.success ? res.data : [];
+
+  return (
+    <div className="p-6">
+      <AddNewMedia allGenres={allGenres} />
+    </div>
+  );
 };
 
-export default addnewmediaPage;
+export default AddNewMediaPage;

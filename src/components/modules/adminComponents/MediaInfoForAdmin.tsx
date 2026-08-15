@@ -2,6 +2,34 @@ import React from "react";
 import Link from "next/link";
 import { getSingleMediaForAdmin } from "@/actions/adminAction/mediaInfoForAdmin.action";
 
+type Genre = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type Media = {
+  id: string | number;
+  title?: string;
+  slug?: string;
+  description?: string;
+  type?: string;
+  access?: string;
+  releaseYear?: number | string | null;
+  posterUrl?: string;
+  trailerUrl?: string;
+  streamingUrl?: string;
+  isPublished?: boolean;
+  isFeatured?: boolean;
+  avgRating?: number;
+  ratingCount?: number;
+  reviewCount?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  deletedAt?: string | Date | null;
+  genres?: { genre: Genre }[];
+};
+
 type Props = {
   id: string;
 };
@@ -17,7 +45,7 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
     );
   }
 
-  const media = res.data;
+  const media: Media = res.data;
   const imageSrc =
     media.posterUrl || "https://placehold.co/300x450?text=No+Poster";
 
@@ -26,21 +54,41 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
       {/* Top Header with Edit Button */}
       <div className="flex justify-between items-center bg-white p-6 border border-gray-200 rounded-2xl shadow-sm">
         <div>
-          <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
-            {media.type || "N/A"}
-          </span>
-          <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full ml-2">
-            {media.access || "N/A"}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full">
+              {media.type || "N/A"}
+            </span>
+            <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full">
+              {media.access || "N/A"}
+            </span>
+          </div>
+
           <h1 className="text-3xl font-bold text-gray-900 mt-2">
             {media.title}
           </h1>
+
           <p className="text-sm text-gray-400 mt-1">
             Slug:{" "}
             <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
               {media.slug || "N/A"}
             </code>
           </p>
+
+          {/* ২. জেনার ট্যাগ সেকশন */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {media.genres && media.genres.length > 0 ? (
+              media.genres.map(({ genre }) => (
+                <span
+                  key={genre.id}
+                  className="text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md border"
+                >
+                  {genre.name}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-400">No genres assigned</span>
+            )}
+          </div>
         </div>
 
         <Link
@@ -85,9 +133,9 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
                 {String(media.isFeatured ?? "N/A")}
               </span>
             </div>
-            <div>
+            <div className="col-span-full">
               <span className="text-gray-400 block text-xs">Description</span>
-              <span className="font-semibold text-gray-700">
+              <span className="font-normal text-gray-700 mt-1 block">
                 {String(media.description ?? "N/A")}
               </span>
             </div>

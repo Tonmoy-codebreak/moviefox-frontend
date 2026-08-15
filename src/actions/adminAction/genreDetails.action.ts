@@ -27,8 +27,6 @@ export async function getGenreDetailsAction(id: string) {
       data: response.data?.data || response.data,
     };
   } catch (error: unknown) {
-    console.error("Get Genre Details Error:", error);
-
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error.response?.data?.message ||

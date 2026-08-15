@@ -3,6 +3,14 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateGenreAction } from "@/actions/adminAction/editGenre.action";
+import {
+  Tag,
+  ArrowLeft,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Save,
+} from "lucide-react";
 
 type Genre = {
   id: string;
@@ -47,22 +55,29 @@ const EditGenre = ({ genre }: Props) => {
       onSubmit={handleSubmit}
       className="bg-white p-6 border border-gray-200 rounded-2xl shadow-sm space-y-6 max-w-xl mx-auto"
     >
-      <div className="border-b pb-4">
-        <h2 className="text-xl font-bold text-gray-900">Edit Genre</h2>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Update the genre name. Slug will be updated automatically.
-        </p>
+      <div className="flex items-start gap-3 border-b pb-4">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+          <Tag className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Edit Genre</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Update the genre name. Slug will be updated automatically.
+          </p>
+        </div>
       </div>
 
       {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-200">
-          {errorMsg}
+        <div className="flex items-start gap-2 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-200">
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3 bg-green-50 text-green-600 text-sm rounded-xl border border-green-200">
-          {successMsg}
+        <div className="flex items-start gap-2 p-3 bg-green-50 text-green-600 text-sm rounded-xl border border-green-200">
+          <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>{successMsg}</span>
         </div>
       )}
 
@@ -71,13 +86,17 @@ const EditGenre = ({ genre }: Props) => {
           <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
             Genre Name
           </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-indigo-600 bg-gray-50/50"
-            required
-          />
+          <div className="relative">
+            <Tag className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Science Fiction"
+              className="w-full p-3 pl-9 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 bg-gray-50/50 transition-colors"
+              required
+            />
+          </div>
         </div>
       </div>
 
@@ -85,16 +104,27 @@ const EditGenre = ({ genre }: Props) => {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-colors cursor-pointer"
         >
+          <ArrowLeft className="w-4 h-4" />
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-1.5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px] justify-center"
         >
-          {loading ? "Saving..." : "Save Changes"}
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" />
+              Save Changes
+            </>
+          )}
         </button>
       </div>
     </form>

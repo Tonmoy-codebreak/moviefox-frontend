@@ -2,6 +2,7 @@ import EditGenre from "@/components/modules/adminComponents/EditGenre";
 import GenreDetails from "@/components/modules/adminComponents/GenreDetails";
 import { getGenreDetailsAction } from "@/actions/adminAction/genreDetails.action";
 import React from "react";
+import DeleteGenre from "@/components/modules/adminComponents/DeleteGenre";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -29,6 +30,10 @@ const GenreDetailsPage = async ({ params }: Props) => {
 
       <div className="max-w-5xl mx-auto px-6">
         <EditGenre genre={genre} />
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6">
+        <DeleteGenre genreId={genre.id} genreName={genre.name} />
       </div>
     </div>
   );

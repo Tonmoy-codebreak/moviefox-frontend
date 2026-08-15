@@ -90,7 +90,7 @@ const sidebarData: SidebarData = {
     {
       title: "Manage Users",
       items: [
-        { label: "Users", icon: Users, href: "/users" },
+        { label: "Users", icon: Users, href: "/allusers" },
         {
           label: "Pending Reviews",
           icon: FilmIcon,

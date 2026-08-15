@@ -9,7 +9,7 @@ const ADMIN_ROUTES = [
   "/addnewmedia",
   "/genres",
   "/pendingreviews",
-  "/users",
+  "/allusers",
   "/adminprofile",
 ];
 

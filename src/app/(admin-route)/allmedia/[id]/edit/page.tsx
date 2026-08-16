@@ -3,6 +3,7 @@ import { getSingleMediaForAdmin } from "@/actions/adminAction/mediaInfoForAdmin.
 
 import EditMediaInfo from "@/components/modules/adminComponents/EditMediaInfo";
 import { getAllGenresAction } from "@/actions/adminAction/showAllGenres.action";
+import { AlertTriangle } from "lucide-react";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -19,8 +20,17 @@ const EditMediaPage = async ({ params }: Props) => {
 
   if (!mediaRes.success || !mediaRes.data) {
     return (
-      <div className="p-6 text-red-500 bg-red-50 border border-red-200 rounded-xl max-w-xl mx-auto mt-10">
-        Failed to load media info: {mediaRes.message}
+      <div className="min-h-screen bg-[#0B0F14] flex justify-center pt-16 px-6">
+        <div className="flex items-start gap-3 p-5 text-[#E26D6D] bg-[#161D27] border border-[#3A2A2A] rounded-xl max-w-xl w-full">
+          <AlertTriangle
+            size={18}
+            strokeWidth={2}
+            className="mt-0.5 flex-shrink-0"
+          />
+          <span className="text-sm">
+            Failed to load media info: {mediaRes.message}
+          </span>
+        </div>
       </div>
     );
   }
@@ -28,20 +38,9 @@ const EditMediaPage = async ({ params }: Props) => {
   const media = mediaRes.data;
   const allGenres = genresRes.success ? genresRes.data : [];
 
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="border-b pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Edit Media: {media.title}
-        </h1>
-        <p className="text-sm text-gray-400">
-          Update the information below and save changes.
-        </p>
-      </div>
-
-      <EditMediaInfo media={media} allGenres={allGenres} />
-    </div>
-  );
+  // EditMediaInfo owns the full page shell (dark background, max-w-4xl frame,
+  // heading, back link) so this route just hands it the data — no duplicate wrapper.
+  return <EditMediaInfo media={media} allGenres={allGenres} />;
 };
 
 export default EditMediaPage;

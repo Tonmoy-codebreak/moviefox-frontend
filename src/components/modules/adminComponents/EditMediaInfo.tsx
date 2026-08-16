@@ -3,6 +3,27 @@
 import React, { useState } from "react";
 import { updateMediaInfoAction } from "@/actions/adminAction/editMediaInfo.action";
 import { useRouter } from "next/navigation";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Type,
+  Link2,
+  FileText,
+  Tag,
+  X,
+  Search,
+  Film,
+  ShieldCheck,
+  CalendarDays,
+  ImageIcon,
+  PlayCircle,
+  Cast,
+  Sparkles,
+  Radio,
+  ArrowLeft,
+  Save,
+  Loader2,
+} from "lucide-react";
 
 type Genre = {
   id: string;
@@ -38,7 +59,6 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // ইনিশিয়ালি মিডিয়ার সাথে যে জেনারগুলো যুক্ত আছে তাদের আইডিগুলো নেওয়া
   const initialGenreIds = media.genres?.map((g) => g.genre.id) || [];
 
   const [formData, setFormData] = useState({
@@ -56,7 +76,6 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
     genreIds: initialGenreIds,
   });
 
-  // জেনার সার্চ এবং ড্রপডাউন ওপেন/ক্লোজ স্টেট
   const [genreSearch, setGenreSearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -75,7 +94,6 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
     }
   };
 
-  // জেনার যোগ করার ফাংশন
   const handleAddGenre = (genreId: string) => {
     if (!formData.genreIds.includes(genreId)) {
       setFormData((prev) => ({
@@ -87,7 +105,6 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
     setIsDropdownOpen(false);
   };
 
-  // জেনার রিমুভ করার ফাংশন
   const handleRemoveGenre = (genreId: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -95,7 +112,6 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
     }));
   };
 
-  // সার্চ কুয়েরি অনুযায়ী জেনার ফিল্টার করা (যেগুলো অলরেডি সিলেক্টেড সেগুলো বাদ দিয়ে)
   const filteredGenres = allGenres.filter(
     (genre) =>
       genre.name.toLowerCase().includes(genreSearch.toLowerCase()) &&
@@ -128,259 +144,383 @@ const EditMediaInfo = ({ media, allGenres }: Props) => {
     }
   };
 
+  // shared input styling — dark surface, subtle border, gold focus
+  const inputClass =
+    "w-full pl-10 pr-3.5 py-2.5 bg-[#0B0F14] border border-[#252E3A] rounded-lg text-sm text-[#F5F5F2] placeholder:text-[#6F7885] outline-none transition-colors focus:border-[#E5B84B] focus:shadow-[0_0_0_3px_rgba(229,184,75,0.12)]";
+  const inputClassNoIcon =
+    "w-full px-3.5 py-2.5 bg-[#0B0F14] border border-[#252E3A] rounded-lg text-sm text-[#F5F5F2] placeholder:text-[#6F7885] outline-none transition-colors focus:border-[#E5B84B] focus:shadow-[0_0_0_3px_rgba(229,184,75,0.12)]";
+  const labelClass =
+    "flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[#8D96A3] mb-1.5";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 border rounded-2xl shadow-sm space-y-6"
-    >
-      {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl">
-          {errorMsg}
-        </div>
-      )}
-      {successMsg && (
-        <div className="p-3 bg-green-50 text-green-600 text-sm rounded-xl">
-          {successMsg}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Title
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-            required
-          />
+    <div className="min-h-screen bg-[#0B0F14]">
+      <div className="max-w-4xl mx-auto px-6 md:px-8 py-8">
+        {/* page heading — stable, doesn't move with form state */}
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-1.5 text-xs text-[#8D96A3] hover:text-[#E5B84B] transition-colors mb-4 cursor-pointer"
+          >
+            <ArrowLeft size={13} strokeWidth={2} />
+            Back
+          </button>
+          <h1 className="text-2xl md:text-[28px] font-semibold tracking-tight text-[#F5F5F2]">
+            Edit Media
+          </h1>
+          <p className="text-sm text-[#6F7885] mt-1">
+            Update the details for &ldquo;{media.title || "this title"}&rdquo;.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Slug
-          </label>
-          <input
-            type="text"
-            name="slug"
-            value={formData.slug}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-            required
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            rows={4}
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-            placeholder="Write media description..."
-          />
-        </div>
-
-        {/* --- আধুনিক জেনার সার্চ ও ট্যাগ সিস্টেম --- */}
-        <div className="md:col-span-2 space-y-3 relative">
-          <label className="block text-xs font-semibold uppercase text-gray-500">
-            Genres
-          </label>
-
-          {/* সিলেক্টেড জেনার ট্যাগগুলো (পিলস উইথ ক্রস আইকন) */}
-          <div className="flex flex-wrap gap-2 min-h-[42px] p-2 border rounded-xl bg-gray-50/50">
-            {formData.genreIds.length === 0 ? (
-              <span className="text-xs text-gray-400 self-center px-2">
-                No genres selected yet. Search below to add.
-              </span>
-            ) : (
-              formData.genreIds.map((id) => {
-                const genreObj = allGenres.find((g) => g.id === id);
-                if (!genreObj) return null;
-                return (
-                  <span
-                    key={genreObj.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-medium rounded-lg shadow-2xs"
-                  >
-                    {genreObj.name}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGenre(genreObj.id)}
-                      className="text-indigo-500 hover:text-red-600 hover:bg-indigo-100 rounded-full p-0.5 transition-colors cursor-pointer"
-                      title="Remove genre"
-                    >
-                      ✕
-                    </button>
-                  </span>
-                );
-              })
+        {/* status banners — fixed slot above the form, doesn't shift layout below */}
+        {(errorMsg || successMsg) && (
+          <div className="mb-5">
+            {errorMsg && (
+              <div className="flex items-center gap-2.5 p-3.5 bg-[rgba(226,109,109,0.08)] border border-[rgba(226,109,109,0.3)] text-[#E26D6D] text-sm rounded-xl">
+                <AlertTriangle
+                  size={16}
+                  strokeWidth={2}
+                  className="flex-shrink-0"
+                />
+                {errorMsg}
+              </div>
             )}
-          </div>
-
-          {/* জেনার সার্চ ইনপুট এবং অটো-সাজেশন ড্রপডাউন */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Type to search & add genres..."
-              value={genreSearch}
-              onChange={(e) => {
-                setGenreSearch(e.target.value);
-                setIsDropdownOpen(true);
-              }}
-              onFocus={() => setIsDropdownOpen(true)}
-              className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600 bg-white"
-            />
-
-            {/* সাজেশন ড্রপডাউন লিস্ট */}
-            {isDropdownOpen && genreSearch.trim() !== "" && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                {filteredGenres.length === 0 ? (
-                  <div className="p-3 text-xs text-gray-400 text-center">
-                    No matching genres found.
-                  </div>
-                ) : (
-                  filteredGenres.map((genre) => (
-                    <div
-                      key={genre.id}
-                      onClick={() => handleAddGenre(genre.id)}
-                      className="px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer transition-colors border-b border-gray-50 last:border-none"
-                    >
-                      {genre.name}
-                    </div>
-                  ))
-                )}
+            {successMsg && (
+              <div className="flex items-center gap-2.5 p-3.5 bg-[rgba(98,198,138,0.08)] border border-[rgba(98,198,138,0.3)] text-[#62C68A] text-sm rounded-xl">
+                <CheckCircle2
+                  size={16}
+                  strokeWidth={2}
+                  className="flex-shrink-0"
+                />
+                {successMsg}
               </div>
             )}
           </div>
-        </div>
-        {/* ------------------------------------- */}
+        )}
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Type
-          </label>
-          <input
-            type="text"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* ===== Basic info ===== */}
+          <div className="bg-[#111720] border border-[#252E3A] rounded-2xl p-6 space-y-5">
+            <h2 className="text-xs uppercase tracking-wider font-semibold text-[#8D96A3] flex items-center gap-1.5">
+              <Film size={13} strokeWidth={2} />
+              Basic Information
+            </h2>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Access
-          </label>
-          <input
-            type="text"
-            name="access"
-            value={formData.access}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className={labelClass}>
+                  <Type size={12} strokeWidth={2} />
+                  Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  required
+                />
+              </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Release Year
-          </label>
-          <input
-            type="number"
-            name="releaseYear"
-            value={formData.releaseYear}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+              <div>
+                <label className={labelClass}>
+                  <Link2 size={12} strokeWidth={2} />
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={formData.slug}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  required
+                />
+              </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Poster URL
-          </label>
-          <input
-            type="text"
-            name="posterUrl"
-            value={formData.posterUrl}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+              <div className="md:col-span-2">
+                <label className={labelClass}>
+                  <FileText size={12} strokeWidth={2} />
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows={4}
+                  value={formData.description}
+                  onChange={handleChange}
+                  className={`${inputClassNoIcon} resize-none leading-relaxed`}
+                  placeholder="Write media description..."
+                />
+              </div>
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Trailer URL
-          </label>
-          <input
-            type="text"
-            name="trailerUrl"
-            value={formData.trailerUrl}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+          {/* ===== Genres ===== */}
+          <div className="bg-[#111720] border border-[#252E3A] rounded-2xl p-6 space-y-3">
+            <h2 className="text-xs uppercase tracking-wider font-semibold text-[#8D96A3] flex items-center gap-1.5">
+              <Tag size={13} strokeWidth={2} />
+              Genres
+            </h2>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Streaming URL
-          </label>
-          <input
-            type="text"
-            name="streamingUrl"
-            value={formData.streamingUrl}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
-          />
-        </div>
+            {/* selected genre pills */}
+            <div className="flex flex-wrap gap-2 min-h-[46px] p-2.5 border border-[#252E3A] rounded-xl bg-[#0B0F14]">
+              {formData.genreIds.length === 0 ? (
+                <span className="text-xs text-[#6F7885] self-center px-1.5">
+                  No genres selected yet. Search below to add.
+                </span>
+              ) : (
+                formData.genreIds.map((id) => {
+                  const genreObj = allGenres.find((g) => g.id === id);
+                  if (!genreObj) return null;
+                  return (
+                    <span
+                      key={genreObj.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#1C2531] border border-[#303A47] text-[#F5F5F2] text-xs font-medium rounded-lg"
+                    >
+                      {genreObj.name}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveGenre(genreObj.id)}
+                        className="text-[#8D96A3] hover:text-[#E26D6D] rounded-full p-0.5 transition-colors cursor-pointer"
+                        title="Remove genre"
+                      >
+                        <X size={12} strokeWidth={2.5} />
+                      </button>
+                    </span>
+                  );
+                })
+              )}
+            </div>
+
+            {/* genre search input and auto suggestion */}
+            <div className="relative">
+              <Search
+                size={15}
+                strokeWidth={2}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6F7885] pointer-events-none"
+              />
+              <input
+                type="text"
+                placeholder="Type to search & add genres..."
+                value={genreSearch}
+                onChange={(e) => {
+                  setGenreSearch(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
+                className={inputClass}
+              />
+
+              {/* suggestion dropdown — absolutely positioned overlay, doesn't push layout */}
+              {isDropdownOpen && genreSearch.trim() !== "" && (
+                <div className="absolute z-20 w-full mt-1.5 bg-[#161D27] border border-[#252E3A] rounded-xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] max-h-48 overflow-y-auto">
+                  {filteredGenres.length === 0 ? (
+                    <div className="p-3.5 text-xs text-[#6F7885] text-center">
+                      No matching genres found.
+                    </div>
+                  ) : (
+                    filteredGenres.map((genre) => (
+                      <div
+                        key={genre.id}
+                        onClick={() => handleAddGenre(genre.id)}
+                        className="px-4 py-2.5 text-sm text-[#B8C0CA] hover:bg-[#1C2531] hover:text-[#F2C963] cursor-pointer transition-colors border-b border-[#1D2530] last:border-none"
+                      >
+                        {genre.name}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ===== Classification ===== */}
+          <div className="bg-[#111720] border border-[#252E3A] rounded-2xl p-6 space-y-5">
+            <h2 className="text-xs uppercase tracking-wider font-semibold text-[#8D96A3] flex items-center gap-1.5">
+              <ShieldCheck size={13} strokeWidth={2} />
+              Classification
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className={labelClass}>
+                  <Cast size={12} strokeWidth={2} />
+                  Type
+                </label>
+                <input
+                  type="text"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  placeholder="movie / series"
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  <ShieldCheck size={12} strokeWidth={2} />
+                  Access
+                </label>
+                <input
+                  type="text"
+                  name="access"
+                  value={formData.access}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  placeholder="free / premium"
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  <CalendarDays size={12} strokeWidth={2} />
+                  Release Year
+                </label>
+                <input
+                  type="number"
+                  name="releaseYear"
+                  value={formData.releaseYear}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ===== Media links ===== */}
+          <div className="bg-[#111720] border border-[#252E3A] rounded-2xl p-6 space-y-5">
+            <h2 className="text-xs uppercase tracking-wider font-semibold text-[#8D96A3] flex items-center gap-1.5">
+              <Link2 size={13} strokeWidth={2} />
+              Media Links
+            </h2>
+
+            <div className="grid grid-cols-1 gap-5">
+              <div>
+                <label className={labelClass}>
+                  <ImageIcon size={12} strokeWidth={2} />
+                  Poster URL
+                </label>
+                <input
+                  type="text"
+                  name="posterUrl"
+                  value={formData.posterUrl}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  <PlayCircle size={12} strokeWidth={2} />
+                  Trailer URL
+                </label>
+                <input
+                  type="text"
+                  name="trailerUrl"
+                  value={formData.trailerUrl}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  <Radio size={12} strokeWidth={2} />
+                  Streaming URL
+                </label>
+                <input
+                  type="text"
+                  name="streamingUrl"
+                  value={formData.streamingUrl}
+                  onChange={handleChange}
+                  className={inputClassNoIcon}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ===== Visibility toggles ===== */}
+          <div className="bg-[#111720] border border-[#252E3A] rounded-2xl p-6">
+            <h2 className="text-xs uppercase tracking-wider font-semibold text-[#8D96A3] mb-4 flex items-center gap-1.5">
+              <Sparkles size={13} strokeWidth={2} />
+              Visibility
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex items-center justify-between gap-3 p-3.5 bg-[#0B0F14] border border-[#252E3A] rounded-xl cursor-pointer">
+                <span className="text-sm font-medium text-[#F5F5F2]">
+                  Is Published
+                </span>
+                <span className="relative inline-flex items-center flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    name="isPublished"
+                    checked={formData.isPublished}
+                    onChange={handleChange}
+                    className="peer sr-only"
+                  />
+                  <span className="h-[22px] w-[38px] rounded-full bg-[#252E3A] border border-[#3A4553] peer-checked:bg-[#E5B84B] peer-checked:border-[#E5B84B] transition-colors" />
+                  <span className="absolute left-[3px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#A7AFBA] peer-checked:bg-[#0B0F14] peer-checked:translate-x-[16px] transition-transform" />
+                </span>
+              </label>
+
+              <label className="flex items-center justify-between gap-3 p-3.5 bg-[#0B0F14] border border-[#252E3A] rounded-xl cursor-pointer">
+                <span className="text-sm font-medium text-[#F5F5F2]">
+                  Is Featured
+                </span>
+                <span className="relative inline-flex items-center flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={formData.isFeatured}
+                    onChange={handleChange}
+                    className="peer sr-only"
+                  />
+                  <span className="h-[22px] w-[38px] rounded-full bg-[#252E3A] border border-[#3A4553] peer-checked:bg-[#E5B84B] peer-checked:border-[#E5B84B] transition-colors" />
+                  <span className="absolute left-[3px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#A7AFBA] peer-checked:bg-[#0B0F14] peer-checked:translate-x-[16px] transition-transform" />
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* ===== Actions — sticky-feeling but stays in flow, always same position ===== */}
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="px-5 py-2.5 bg-transparent border border-[#3A4553] hover:bg-[#161D27] text-[#F5F5F2] rounded-lg text-sm font-medium transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E5B84B] hover:bg-[#F2C963] text-[#0B0F14] rounded-lg text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2
+                    size={15}
+                    strokeWidth={2.5}
+                    className="animate-spin"
+                  />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={15} strokeWidth={2.5} />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div className="flex gap-6 pt-4 border-t">
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-          <input
-            type="checkbox"
-            name="isPublished"
-            checked={formData.isPublished}
-            onChange={handleChange}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          Is Published
-        </label>
-
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-          <input
-            type="checkbox"
-            name="isFeatured"
-            checked={formData.isFeatured}
-            onChange={handleChange}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          Is Featured
-        </label>
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-colors cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
-        >
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
-      </div>
-    </form>
+    </div>
   );
 };
 

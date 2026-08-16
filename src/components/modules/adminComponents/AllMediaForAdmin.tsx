@@ -1,8 +1,21 @@
 "use client";
 
 import { getAdminAllMedia } from "@/actions/adminAction/allMediaForAdmin.action";
-import Link from "next/link"; // 👈 লিংকের জন্য ইমপোর্ট
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import {
+  Search,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Film,
+  Clapperboard,
+  Tag,
+  Calendar,
+  ImageOff,
+  Loader2,
+  Inbox,
+} from "lucide-react";
 
 type MediaItem = {
   id: string | number;
@@ -59,64 +72,98 @@ const AllMediaForAdmin = () => {
   }, [searchTerm, mediaType, sortBy, sortOrder]);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">All Media (Admin)</h1>
+    <div className="min-h-screen bg-[#0B0F14] p-6 md:p-10 space-y-8">
+      {/* header */}
+      <div className="space-y-1">
+        <h1 className="text-2xl md:text-[28px] font-semibold tracking-tight text-[#F5F5F2]">
+          All Media
+        </h1>
+        <p className="text-sm text-[#6F7885]">
+          Manage and review every title in your library.
+        </p>
+      </div>
 
-      {/* সার্চবার এবং ফিল্টার */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-        <div className="w-full md:w-1/3">
+      {/* toolbar */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-[#111720] border border-[#252E3A] rounded-xl p-4">
+        {/* search */}
+        <div className="relative w-full md:w-1/3">
+          <Search
+            size={16}
+            strokeWidth={2}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6F7885] pointer-events-none"
+          />
           <input
             type="text"
             placeholder="Search by title..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-[#111720] border border-[#252E3A] rounded-lg text-sm text-[#F5F5F2] placeholder:text-[#6F7885] outline-none transition-colors focus:border-[#E5B84B] focus:shadow-[0_0_0_3px_rgba(229,184,75,0.12)]"
           />
         </div>
 
+        {/* controls */}
         <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          <select
-            value={mediaType}
-            onChange={(e) => setMediaType(e.target.value)}
-            className="px-3 py-2 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-          >
-            <option value="">All Types</option>
-            <option value="movie">Movie</option>
-            <option value="series">Series</option>
-          </select>
+          <div className="relative">
+            <Clapperboard
+              size={15}
+              strokeWidth={2}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6F7885] pointer-events-none"
+            />
+            <select
+              value={mediaType}
+              onChange={(e) => setMediaType(e.target.value)}
+              className="appearance-none pl-8 pr-8 py-2.5 border border-[#252E3A] rounded-lg text-sm bg-[#111720] text-[#F5F5F2] outline-none transition-colors focus:border-[#E5B84B] cursor-pointer hover:bg-[#161D27]"
+            >
+              <option value="">All Types</option>
+              <option value="movie">Movie</option>
+              <option value="series">Series</option>
+            </select>
+          </div>
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-          >
-            <option value="createdAt">Date Added</option>
-            <option value="title">Title</option>
-          </select>
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none pl-4 pr-8 py-2.5 border border-[#252E3A] rounded-lg text-sm bg-[#111720] text-[#F5F5F2] outline-none transition-colors focus:border-[#E5B84B] cursor-pointer hover:bg-[#161D27]"
+            >
+              <option value="createdAt">Date Added</option>
+              <option value="title">Title</option>
+            </select>
+          </div>
 
           <button
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            className="px-4 py-2 border rounded-lg text-sm bg-gray-50 hover:bg-gray-100 font-medium transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 border border-[#3A4553] rounded-lg text-sm text-[#F5F5F2] font-medium bg-transparent hover:bg-[#161D27] transition-colors cursor-pointer"
           >
-            {sortOrder === "asc" ? "Ascending (↑)" : "Descending (↓)"}
+            {sortOrder === "asc" ? (
+              <ArrowUp size={15} strokeWidth={2} className="text-[#A7AFBA]" />
+            ) : (
+              <ArrowDown size={15} strokeWidth={2} className="text-[#A7AFBA]" />
+            )}
+            {sortOrder === "asc" ? "Ascending" : "Descending"}
           </button>
         </div>
       </div>
 
-      {/* মিডিয়া লিস্ট */}
+      {/* media list */}
       {loading ? (
-        <div className="text-center py-10 text-gray-500">Loading media...</div>
+        <div className="flex flex-col items-center justify-center gap-3 py-20 text-[#6F7885]">
+          <Loader2
+            size={22}
+            strokeWidth={2}
+            className="animate-spin text-[#E5B84B]"
+          />
+          <span className="text-sm">Loading media...</span>
+        </div>
       ) : mediaList.length === 0 ? (
-        <div className="text-center py-10 text-gray-400 bg-white border rounded-xl">
-          No media found.
+        <div className="flex flex-col items-center justify-center gap-3 py-20 bg-[#111720] border border-[#252E3A] rounded-xl">
+          <Inbox size={26} strokeWidth={1.5} className="text-[#6F7885]" />
+          <span className="text-sm text-[#8D96A3]">No media found.</span>
         </div>
       ) : (
         <div className="space-y-3">
           {mediaList.map((media: MediaItem) => {
-            const imageSrc =
-              media.posterUrl ||
-              media.image ||
-              "https://placehold.co/100x150?text=No+Image";
+            const imageSrc = media.posterUrl || media.image || "";
 
             const renderGenres = () => {
               if (
@@ -124,7 +171,7 @@ const AllMediaForAdmin = () => {
                 (Array.isArray(media.genre) && media.genre.length === 0) ||
                 media.genre === ""
               ) {
-                return <span className="text-gray-400">None</span>;
+                return <span className="text-[#6F7885]">None</span>;
               }
               if (Array.isArray(media.genre)) {
                 return media.genre.join(", ");
@@ -133,59 +180,79 @@ const AllMediaForAdmin = () => {
             };
 
             return (
-              /* 👈 লিংকের মাধ্যমে ডাইনামিক পেজে রিডাইরেক্ট করা হচ্ছে */
               <Link
                 key={media.id}
                 href={`/allmedia/${media.id}`}
-                className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:shadow-md hover:border-indigo-300 block"
+                className="group p-4 bg-[#161D27] border border-[#252E3A] rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-200 hover:bg-[#1C2531] hover:border-[#3A4553]"
               >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={imageSrc}
-                    alt={media.title}
-                    className="w-14 h-20 object-cover rounded-lg border bg-gray-100 flex-shrink-0"
-                  />
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-14 h-20 rounded-lg border border-[#252E3A] bg-[#0B0F14] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {imageSrc ? (
+                      <img
+                        src={imageSrc}
+                        alt={media.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <ImageOff
+                        size={18}
+                        strokeWidth={1.5}
+                        className="text-[#6F7885]"
+                      />
+                    )}
+                  </div>
 
-                  <div className="space-y-1">
-                    <h3 className="font-semibold text-gray-800 text-base hover:text-indigo-600 transition-colors">
+                  <div className="space-y-1.5 min-w-0">
+                    <h3 className="font-semibold text-[#F5F5F2] text-base transition-colors group-hover:text-[#F2C963] truncate">
                       {media.title}
                     </h3>
 
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                      <span>
-                        Type:{" "}
-                        <strong className="uppercase text-indigo-600">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#A7AFBA]">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Film
+                          size={12}
+                          strokeWidth={2}
+                          className="text-[#8D96A3]"
+                        />
+                        <strong className="uppercase tracking-wide text-[#E5B84B] font-semibold">
                           {media.type || "N/A"}
                         </strong>
                       </span>
                       {media.slug && (
-                        <span>
-                          • Slug:{" "}
-                          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="text-[#6F7885]">•</span>
+                          <code className="bg-[#1C2531] border border-[#252E3A] px-1.5 py-0.5 rounded text-[#A7AFBA] text-[11px]">
                             {media.slug}
                           </code>
                         </span>
                       )}
                     </div>
 
-                    <div className="text-xs text-gray-600">
-                      <span className="font-medium text-gray-500">Genre: </span>
-                      {renderGenres()}
+                    <div className="flex items-start gap-1.5 text-xs text-[#A7AFBA]">
+                      <Tag
+                        size={12}
+                        strokeWidth={2}
+                        className="text-[#8D96A3] mt-0.5"
+                      />
+                      <span>
+                        <span className="text-[#6F7885]">Genre: </span>
+                        {renderGenres()}
+                      </span>
                     </div>
 
                     {media.tags && (
-                      <div className="flex flex-wrap gap-1 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-1">
                         {Array.isArray(media.tags) ? (
                           media.tags.map((tag, idx) => (
                             <span
                               key={idx}
-                              className="text-[10px] px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full font-medium"
+                              className="text-[10px] px-2 py-0.5 bg-[#1C2531] text-[#B8C0CA] border border-[#303A47] rounded-full font-medium"
                             >
                               #{tag}
                             </span>
                           ))
                         ) : (
-                          <span className="text-[10px] px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full font-medium">
+                          <span className="text-[10px] px-2 py-0.5 bg-[#1C2531] text-[#B8C0CA] border border-[#303A47] rounded-full font-medium">
                             #{media.tags}
                           </span>
                         )}
@@ -194,10 +261,15 @@ const AllMediaForAdmin = () => {
                   </div>
                 </div>
 
-                <span className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full font-medium self-end sm:self-center">
+                <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 bg-[#1C2531] border border-[#252E3A] text-[#A7AFBA] rounded-full font-medium self-end sm:self-center whitespace-nowrap">
+                  <Calendar
+                    size={12}
+                    strokeWidth={2}
+                    className="text-[#6F7885]"
+                  />
                   {media.createdAt
                     ? new Date(media.createdAt).toLocaleDateString()
-                    : ""}
+                    : "—"}
                 </span>
               </Link>
             );

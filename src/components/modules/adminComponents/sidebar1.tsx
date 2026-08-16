@@ -8,6 +8,7 @@ import {
   LogOut,
   ShieldCheck,
   Tags,
+  Trash2,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -97,6 +98,10 @@ const sidebarData: SidebarData = {
           href: "/pendingreviews",
         },
       ],
+    },
+    {
+      title: "Manage Trash",
+      items: [{ label: "Recycle Bin", icon: Trash2, href: "/recyclebin" }],
     },
   ],
   footerItems: [

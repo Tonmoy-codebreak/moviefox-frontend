@@ -11,6 +11,7 @@ const ADMIN_ROUTES = [
   "/pendingreviews",
   "/allusers",
   "/adminprofile",
+  "/recyclebin",
 ];
 
 export function proxy(request: NextRequest) {

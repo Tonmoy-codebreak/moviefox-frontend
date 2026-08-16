@@ -1,11 +1,32 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { getSingleMediaForAdmin } from "@/actions/adminAction/mediaInfoForAdmin.action";
+import {
+  getSingleMediaForAdmin,
+  getReviewsByMediaIdForAdmin,
+  deleteReviewForAdmin,
+} from "@/actions/adminAction/mediaInfoForAdmin.action";
+import { Trash2, Loader2, Star } from "lucide-react";
 
 type Genre = {
   id: string;
   name: string;
   slug: string;
+};
+
+type ReviewUser = {
+  id: string;
+  name: string;
+};
+
+type Review = {
+  id: string;
+  rating: number;
+  content?: string;
+  review?: string;
+  createdAt?: string | Date;
+  user?: ReviewUser;
 };
 
 type Media = {
@@ -34,18 +55,73 @@ type Props = {
   id: string;
 };
 
-const MediaInfoForAdmin = async ({ id }: Props) => {
-  const res = await getSingleMediaForAdmin(id);
+const MediaInfoForAdmin = ({ id }: Props) => {
+  const [media, setMedia] = useState<Media | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  if (!res.success || !res.data) {
+  // মিডিয়া এবং রিভিউ ফেচ করা
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const mediaRes = await getSingleMediaForAdmin(id);
+
+      if (!mediaRes.success || !mediaRes.data) {
+        setErrorMsg(mediaRes.message || "Failed to load media details");
+        setLoading(false);
+        return;
+      }
+
+      setMedia(mediaRes.data);
+
+      // রিভিউ ফেচ করা (/review/media/:mediaId)
+      const reviewsRes = await getReviewsByMediaIdForAdmin(id);
+      if (reviewsRes.success) {
+        setReviews(reviewsRes.data);
+      }
+
+      setLoading(false);
+    }
+
+    fetchData();
+  }, [id]);
+
+  // রিভিউ ডিলিট হ্যান্ডলার
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+
+    setDeletingId(reviewId);
+
+    // সার্ভার অ্যাকশনের মাধ্যমে সিকিউরড ডিলিট রিকোয়েস্ট
+    const res = await deleteReviewForAdmin(reviewId);
+
+    if (res.success) {
+      setReviews((prev) => prev.filter((rev) => rev.id !== reviewId));
+    } else {
+      alert(res.message || "Failed to delete review");
+    }
+
+    setDeletingId(null);
+  };
+
+  if (loading) {
     return (
-      <div className="p-6 text-red-500 bg-red-50 border border-red-200 rounded-xl">
-        Failed to load media: {res.message}
+      <div className="flex justify-center items-center py-32">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
   }
 
-  const media: Media = res.data;
+  if (errorMsg || !media) {
+    return (
+      <div className="p-6 text-red-500 bg-red-50 border border-red-200 rounded-xl max-w-5xl mx-auto mt-6">
+        Failed to load media: {errorMsg}
+      </div>
+    );
+  }
+
   const imageSrc =
     media.posterUrl || "https://placehold.co/300x450?text=No+Poster";
 
@@ -74,7 +150,7 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
             </code>
           </p>
 
-          {/* ২. জেনার ট্যাগ সেকশন */}
+          {/* জেনার ট্যাগ সেকশন */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {media.genres && media.genres.length > 0 ? (
               media.genres.map(({ genre }) => (
@@ -160,11 +236,76 @@ const MediaInfoForAdmin = async ({ id }: Props) => {
             <div className="bg-gray-50 p-3 rounded-xl border">
               <span className="text-gray-400 block text-xs">Review Count</span>
               <span className="font-bold text-lg text-gray-800">
-                {media.reviewCount ?? 0}
+                {reviews.length}
               </span>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section with Hover Delete Button */}
+      <div className="bg-white p-6 border border-gray-200 rounded-2xl shadow-sm space-y-4">
+        <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
+          Reviews ({reviews.length})
+        </h2>
+
+        {reviews.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-4">
+            No reviews found for this media.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {reviews.map((review) => {
+              const isDeleting = deletingId === review.id;
+              return (
+                <div
+                  key={review.id}
+                  className="group relative p-4 bg-gray-50/50 border border-gray-200 rounded-xl transition-all hover:bg-gray-50 hover:shadow-sm"
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="font-semibold text-sm text-gray-800">
+                        {review.user?.name || "Anonymous User"}
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-amber-600 mt-0.5 font-medium">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <span>{review.rating} / 5</span>
+                      </div>
+                    </div>
+
+                    <span className="text-xs text-gray-400">
+                      {review.createdAt
+                        ? new Date(review.createdAt).toLocaleDateString()
+                        : ""}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-gray-700 mt-2 bg-white p-3 rounded-lg border border-gray-100">
+                    {review.content || review.review || "No text provided."}
+                  </p>
+
+                  {/* Hover Delete Button */}
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteReview(review.id)}
+                      disabled={isDeleting}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium shadow transition-colors cursor-pointer disabled:opacity-50"
+                      title="Delete Review"
+                    >
+                      {isDeleting ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3.5 h-3.5" />
+                      )}
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* url section */}

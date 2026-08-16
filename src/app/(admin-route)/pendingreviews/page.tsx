@@ -1,7 +1,12 @@
+import ShowPendingReviews from "@/components/modules/adminComponents/ShowPendingReviews";
 import React from "react";
 
-const pendingreviewsPage = () => {
-  return <div>pendingreviewsPage</div>;
+const PendingReviewsPage = () => {
+  return (
+    <div>
+      <ShowPendingReviews />
+    </div>
+  );
 };
 
-export default pendingreviewsPage;
+export default PendingReviewsPage;

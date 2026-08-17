@@ -3,6 +3,22 @@ import AddToWatchlist from "@/components/modules/userComponents/AddToWatchlist";
 import ShowAllReview from "@/components/modules/publicComponents/ShowAllReview";
 import API from "@/lib/api";
 import { notFound } from "next/navigation";
+import WriteReview from "@/components/modules/userComponents/WriteReview";
+import { cookies } from "next/headers";
+import axios from "axios";
+import {
+  Play,
+  ExternalLink,
+  Star,
+  Sparkles,
+  CalendarDays,
+  Clapperboard,
+  Lock,
+  Unlock,
+  Users,
+  MessageSquareText,
+  Hash,
+} from "lucide-react";
 
 interface MediaItem {
   id: string;
@@ -32,10 +48,38 @@ export default async function MediaDetailsPage({ params }: PageProps) {
   const { id } = resolvedParams;
 
   let media: MediaItem | null = null;
+  let hasUserReviewed = false;
+  let currentUserId: string | null = null;
 
   try {
     const response = await API.get(`/media/${id}`);
     media = response.data?.data || response.data;
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (token) {
+      const BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
+      const myReviewsRes = await axios
+        .get(`${BASE_URL}/review/my-reviews`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .catch(() => null);
+
+      const userReviews = myReviewsRes?.data?.data || myReviewsRes?.data || [];
+
+      if (userReviews.length > 0) {
+        currentUserId =
+          userReviews[0].userId || userReviews[0].user?.id || null;
+      }
+
+      hasUserReviewed = userReviews.some(
+        (review: { mediaId?: string; media?: { id: string } }) =>
+          review.mediaId === id || review.media?.id === id,
+      );
+    }
   } catch (error) {
     notFound();
   }
@@ -44,113 +88,177 @@ export default async function MediaDetailsPage({ params }: PageProps) {
     notFound();
   }
 
-  return (
-    <main className="container mx-auto p-6 max-w-5xl">
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden p-6 md:p-8 space-y-8">
-        {/* Top Section: Poster & Core Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Poster */}
-          <div className="relative w-full h-[400px] bg-gray-100 rounded-xl overflow-hidden shadow-md">
-            {media.posterUrl ? (
-              <img
-                src={media.posterUrl}
-                alt={media.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-medium">
-                No Poster Available
-              </div>
-            )}
-          </div>
+  const addedDate = new Date(media.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
-          {/* Details & Metadata */}
-          <div className="md:col-span-2 flex flex-col justify-between space-y-4">
-            <div>
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full uppercase">
+  return (
+    <main className="min-h-screen bg-[#0B0F14]">
+      {/* ================= HERO ================= */}
+      <section className="relative overflow-hidden border-b border-[#252E3A]">
+        {media.posterUrl && (
+          <div className="absolute inset-0" aria-hidden="true">
+            <img
+              src={media.posterUrl}
+              alt=""
+              className="w-full h-full object-cover scale-110 blur-3xl opacity-25"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F14]/60 via-[#0B0F14]/85 to-[#0B0F14]" />
+          </div>
+        )}
+
+        <div className="relative container mx-auto px-6 pt-12 pb-10 md:pt-16 md:pb-14 max-w-5xl">
+          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 items-end">
+            {/* Poster */}
+            <div className="w-40 sm:w-48 md:w-full mx-auto md:mx-0 aspect-[2/3] rounded-xl overflow-hidden border border-[#252E3A] bg-[#161D27] shadow-2xl shadow-black/40">
+              {media.posterUrl ? (
+                <img
+                  src={media.posterUrl}
+                  alt={media.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[#6F7885] text-xs font-medium text-center px-3">
+                  No poster available
+                </div>
+              )}
+            </div>
+
+            {/* Title & meta */}
+            <div className="text-center md:text-left space-y-4">
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-md bg-[#161D27] border border-[#252E3A] text-[#A7AFBA]">
+                  <Clapperboard className="w-3 h-3" />
                   {media.type}
                 </span>
                 <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full uppercase ${
+                  className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-md border ${
                     media.access === "FREE"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-amber-100 text-amber-700"
+                      ? "bg-[#161D27] border-[#252E3A] text-[#A7AFBA]"
+                      : "bg-[#E5B84B]/10 border-[#E5B84B]/30 text-[#E5B84B]"
                   }`}
                 >
-                  {media.access} Access
+                  {media.access === "FREE" ? (
+                    <Unlock className="w-3 h-3" />
+                  ) : (
+                    <Lock className="w-3 h-3" />
+                  )}
+                  {media.access} access
                 </span>
                 {media.isFeatured && (
-                  <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full uppercase">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-md bg-[#E5B84B]/10 border border-[#E5B84B]/30 text-[#E5B84B]">
+                    <Sparkles className="w-3 h-3" />
                     Featured
                   </span>
                 )}
               </div>
 
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#F5F5F2] tracking-tight text-balance">
                 {media.title}
               </h1>
-              <p className="text-gray-500 font-medium text-lg">
-                Release Year:{" "}
-                <span className="text-gray-800">{media.releaseYear}</span>
-              </p>
-            </div>
 
-            {/* Ratings Summary Box */}
-            <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center gap-6">
-              <div>
-                <div className="text-3xl font-black text-gray-900 flex items-center gap-1">
-                  ⭐ {media.avgRating ? media.avgRating.toFixed(1) : "0.0"}{" "}
-                  <span className="text-sm font-normal text-gray-400">/ 5</span>
-                </div>
-                <div className="text-xs text-gray-500 mt-0.5">
-                  {media.ratingCount} Ratings • {media.reviewCount} Reviews
-                </div>
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-5 gap-y-2 text-sm text-[#A7AFBA]">
+                <span className="font-medium">{media.releaseYear}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Star className="w-4 h-4 fill-[#E5B84B] text-[#E5B84B]" />
+                  <span className="text-[#F5F5F2] font-semibold">
+                    {media.avgRating ? media.avgRating.toFixed(1) : "0.0"}
+                  </span>
+                  <span className="text-[#6F7885]">/ 5</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  {media.ratingCount} ratings
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <MessageSquareText className="w-4 h-4" />
+                  {media.reviewCount} reviews
+                </span>
               </div>
-            </div>
 
-            {/* Action Links (Trailer & Streaming) & Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              {media.trailerUrl && (
-                <a
-                  href={media.trailerUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors text-sm shadow-sm"
-                >
-                  Watch Trailer 🎬
-                </a>
-              )}
-              {media.streamingUrl && (
-                <a
-                  href={media.streamingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors text-sm shadow-sm"
-                >
-                  Stream Now 🚀
-                </a>
-              )}
-
-              {/* Add to Watchlist Button Component */}
-              <AddToWatchlist mediaId={media.id} />
-
-              {/* Add to Completed Button Component with mediaId */}
-              <AddToCompleted mediaId={media.id} />
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 pt-1">
+                {media.streamingUrl && (
+                  <a
+                    href={media.streamingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E5B84B] hover:bg-[#F2C963] text-[#0B0F14] font-semibold rounded-lg transition-colors text-sm"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Stream now
+                  </a>
+                )}
+                {media.trailerUrl && (
+                  <a
+                    href={media.trailerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-transparent border border-[#3A4553] hover:bg-[#161D27] text-[#F5F5F2] font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Play className="w-4 h-4" />
+                    Watch trailer
+                  </a>
+                )}
+                <AddToWatchlist mediaId={media.id} />
+                <AddToCompleted mediaId={media.id} />
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Footer Info */}
-        <div className="border-t pt-4 flex justify-between items-center text-xs text-gray-400">
-          <span>Slug: {media.slug}</span>
-          <span>
-            Added on: {new Date(media.createdAt).toISOString().split("T")[0]}
-          </span>
+      {/* ================= BODY ================= */}
+      <div className="container mx-auto px-6 py-10 max-w-5xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 items-start">
+          {/* Main column: write + reviews */}
+          <div className="space-y-8 min-w-0">
+            <WriteReview mediaId={media.id} hasReviewed={hasUserReviewed} />
+            <ShowAllReview mediaId={media.id} currentUserId={currentUserId} />
+          </div>
+
+          {/* Sidebar: quick facts, sticky on desktop */}
+          <aside className="space-y-4 lg:sticky lg:top-6">
+            <div className="p-5 rounded-xl bg-[#111720] border border-[#252E3A] space-y-4">
+              <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-[#8D96A3]">
+                Details
+              </h2>
+              <dl className="space-y-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-[#6F7885]">Type</dt>
+                  <dd className="text-[#F5F5F2] font-medium">{media.type}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-[#6F7885]">Access</dt>
+                  <dd className="text-[#F5F5F2] font-medium">{media.access}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-[#6F7885]">Release year</dt>
+                  <dd className="text-[#F5F5F2] font-medium">
+                    {media.releaseYear}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#252E3A]">
+                  <dt className="inline-flex items-center gap-1.5 text-[#6F7885]">
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    Added
+                  </dt>
+                  <dd className="text-[#A7AFBA]">{addedDate}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="inline-flex items-center gap-1.5 text-[#6F7885]">
+                    <Hash className="w-3.5 h-3.5" />
+                    Slug
+                  </dt>
+                  <dd className="text-[#A7AFBA] truncate max-w-[140px]">
+                    {media.slug}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </aside>
         </div>
-
-        {/* Show All Review Component with mediaId passed */}
-        <ShowAllReview mediaId={media.id} />
       </div>
     </main>
   );

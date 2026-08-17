@@ -30,16 +30,29 @@ export default async function MediaPage({ searchParams }: PageProps) {
     : { page: 1, limit: 10, total: 0, totalPages: 1 };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <h1 className="text-8xl text-center font-bold mb-6">Media Library</h1>
+    <div className="min-h-screen bg-[#0B0F14]">
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="mb-8 pb-6 border-b border-[#252E3A]">
+          <span className="inline-block text-xs font-bold uppercase tracking-[0.12em] text-[#E5B84B] mb-2">
+            Browse
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F5F5F2] tracking-tight">
+            Media library
+          </h1>
+          <p className="text-sm text-[#8D96A3] mt-2">
+            {meta.total} {meta.total === 1 ? "title" : "titles"} available to
+            explore
+          </p>
+        </div>
 
-      <MediaContainer
-        initialMovies={movies}
-        initialMeta={meta}
-        currentSearch={searchTerm}
-        currentSortBy={sortBy}
-        currentSortOrder={sortOrder}
-      />
+        <MediaContainer
+          initialMovies={movies}
+          initialMeta={meta}
+          currentSearch={searchTerm}
+          currentSortBy={sortBy}
+          currentSortOrder={sortOrder}
+        />
+      </div>
     </div>
   );
 }

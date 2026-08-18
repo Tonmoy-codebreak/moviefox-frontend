@@ -12,6 +12,7 @@ import {
   Bookmark,
   CheckCircle2,
   Circle,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -134,29 +135,50 @@ const Navbar1 = ({
       ? pathname === "/"
       : pathname === url || pathname?.startsWith(`${url}/`);
 
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "";
+
   return (
     <section
       className={cn(
-        "sticky top-0 z-50 px-4 transition-shadow duration-300 bg-black border-b border-white/10",
-        scrolled ? "shadow-[0_4px_20px_-6px_rgba(0,0,0,0.6)]" : "shadow-none",
+        "sticky top-0 z-50 px-4 transition-all duration-300 border-b",
+        scrolled
+          ? "bg-black/80 backdrop-blur-xl border-white/10 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.8)]"
+          : "bg-black border-transparent",
         className,
       )}
     >
       <div className="container px-4 mx-auto">
         {/* Desktop Menu */}
         <nav className="hidden items-center justify-between lg:flex h-16">
-          <div className="flex items-center gap-10">
+          <div className="flex items-center gap-8">
             {/* Logo */}
-            <Link href={logo.url} className="flex items-center gap-2.5">
-              <img src={logo.src} className="max-h-7 invert" alt={logo.alt} />
+            <Link
+              href={logo.url}
+              className="flex items-center gap-2.5 group shrink-0"
+            >
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-yellow-400 shadow-[0_0_0_1px_rgba(255,255,255,0.1)] transition-transform duration-200 group-hover:scale-105">
+                <img
+                  src={logo.src}
+                  className="max-h-4.5 w-4.5"
+                  alt={logo.alt}
+                />
+              </div>
               <span className="text-lg font-bold tracking-tight text-white">
                 {logo.title}
               </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-[#E23636]" />
             </Link>
-            <div className="flex items-center">
+
+            {/* Nav pills */}
+            <div className="flex items-center rounded-full border border-white/10 bg-white/[0.03] p-1">
               <NavigationMenu>
-                <NavigationMenuList className="gap-1">
+                <NavigationMenuList className="gap-0.5">
                   {filteredMenu.map((item) =>
                     renderMenuItem(item, isActive(item.url)),
                   )}
@@ -168,23 +190,25 @@ const Navbar1 = ({
           {/* Desktop Auth Buttons */}
           <div className="flex gap-3 items-center">
             {loading ? (
-              <span className="text-sm text-white/40">Loading...</span>
+              <div className="flex items-center gap-2 text-sm text-white/40">
+                <span className="h-3.5 w-3.5 rounded-full border-2 border-white/20 border-t-yellow-400 animate-spin" />
+                Loading...
+              </div>
             ) : user ? (
               <>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
+                <Link
+                  href="/userprofile"
+                  className="flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] pl-1.5 pr-4 py-1.5 text-sm font-medium text-white/90 transition-colors hover:border-yellow-400/40 hover:bg-white/[0.06]"
                 >
-                  <Link href="/userprofile">
-                    <User className="size-4" />
-                    {user.name}
-                  </Link>
-                </Button>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-yellow-400 text-[11px] font-bold text-gray-900">
+                    {initials || <User className="size-3.5" />}
+                  </span>
+                  {user.name}
+                </Link>
                 <Button
                   size="sm"
-                  className="bg-[#E23636] text-white hover:bg-[#c92c2c] gap-1.5"
+                  variant="ghost"
+                  className="text-white/70 hover:text-white hover:bg-white/[0.06] gap-1.5"
                   onClick={() => {
                     logout();
                     window.location.href = "/";
@@ -198,9 +222,9 @@ const Navbar1 = ({
               <>
                 <Button
                   asChild
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
+                  className="text-white/70 hover:text-white hover:bg-white/[0.06] gap-1.5"
                 >
                   <Link href={auth.login.url}>
                     <LogIn className="size-4" />
@@ -210,7 +234,7 @@ const Navbar1 = ({
                 <Button
                   asChild
                   size="sm"
-                  className="bg-[#F5C518] text-black hover:bg-white gap-1.5 font-semibold"
+                  className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 gap-1.5 font-semibold shadow-[0_0_0_1px_rgba(0,0,0,0.05)] transition-transform hover:scale-[1.02]"
                 >
                   <Link href={auth.signup.url}>
                     <UserPlus className="size-4" />
@@ -226,8 +250,10 @@ const Navbar1 = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-7 invert" alt={logo.alt} />
+            <Link href={logo.url} className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-yellow-400">
+                <img src={logo.src} className="max-h-4 w-4" alt={logo.alt} />
+              </div>
               <span className="text-base font-bold tracking-tight text-white">
                 {logo.title}
               </span>
@@ -237,31 +263,49 @@ const Navbar1 = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black"
+                  className="border-white/15 bg-white/[0.03] text-white hover:bg-white/10"
                 >
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto bg-black border-l border-white/10 text-white">
+              <SheetContent className="overflow-y-auto bg-black border-l border-white/10 text-white w-[85vw] sm:w-80">
                 <SheetHeader>
                   <SheetTitle>
-                    <Link href={logo.url} className="flex items-center gap-2">
-                      <img
-                        src={logo.src}
-                        className="max-h-7 invert"
-                        alt={logo.alt}
-                      />
+                    <Link href={logo.url} className="flex items-center gap-2.5">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-yellow-400">
+                        <img
+                          src={logo.src}
+                          className="max-h-4 w-4"
+                          alt={logo.alt}
+                        />
+                      </div>
                       <span className="text-base font-bold tracking-tight text-white">
                         {logo.title}
                       </span>
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
+
+                {/* User summary card (mobile) */}
+                {!loading && user && (
+                  <div className="mx-4 mt-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-400 text-sm font-bold text-gray-900">
+                      {initials || <User className="size-4" />}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-white">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-white/50">Signed in</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-6 p-4">
                   <Accordion
                     type="single"
                     collapsible
-                    className="flex w-full flex-col gap-4"
+                    className="flex w-full flex-col gap-1"
                   >
                     {filteredMenu.map((item) =>
                       renderMobileMenuItem(item, isActive(item.url)),
@@ -269,7 +313,7 @@ const Navbar1 = ({
                   </Accordion>
 
                   {/* Mobile Auth Buttons */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2.5 border-t border-white/10 pt-5">
                     {loading ? (
                       <span className="text-sm text-white/40 text-center">
                         Loading...
@@ -279,15 +323,16 @@ const Navbar1 = ({
                         <Button
                           asChild
                           variant="outline"
-                          className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
+                          className="border-white/15 bg-white/[0.03] text-white hover:bg-white/10 gap-1.5 justify-start"
                         >
                           <Link href="/userprofile">
                             <User className="size-4" />
-                            {user.name}
+                            My Profile
                           </Link>
                         </Button>
                         <Button
-                          className="bg-[#E23636] text-white hover:bg-[#c92c2c] gap-1.5"
+                          variant="ghost"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10 gap-1.5 justify-start"
                           onClick={logout}
                         >
                           <LogOut className="size-4" />
@@ -299,7 +344,7 @@ const Navbar1 = ({
                         <Button
                           asChild
                           variant="outline"
-                          className="border-white/25 bg-transparent text-white hover:bg-white hover:text-black gap-1.5"
+                          className="border-white/15 bg-white/[0.03] text-white hover:bg-white/10 gap-1.5 justify-start"
                         >
                           <Link href={auth.login.url}>
                             <LogIn className="size-4" />
@@ -308,7 +353,7 @@ const Navbar1 = ({
                         </Button>
                         <Button
                           asChild
-                          className="bg-[#F5C518] text-black hover:bg-white gap-1.5 font-semibold"
+                          className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 gap-1.5 font-semibold justify-start"
                         >
                           <Link href={auth.signup.url}>
                             <UserPlus className="size-4" />
@@ -334,11 +379,11 @@ const renderMenuItem = (item: MenuItem, active: boolean) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="bg-transparent text-white/80 hover:text-[#F5C518] data-[state=open]:text-[#F5C518] text-sm font-medium gap-1.5">
+        <NavigationMenuTrigger className="rounded-full bg-transparent text-white/70 hover:text-yellow-400 hover:bg-white/[0.06] data-[state=open]:text-yellow-400 data-[state=open]:bg-white/[0.06] text-sm font-medium gap-1.5 px-4 h-8">
           <Icon className="size-4" />
           {item.title}
         </NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-black text-white border border-white/10">
+        <NavigationMenuContent className="bg-black text-white border border-white/10 rounded-xl overflow-hidden">
           {item.items.map((subItem) => (
             <NavigationMenuLink asChild key={subItem.title} className="w-80">
               <SubMenuLink item={subItem} />
@@ -355,20 +400,14 @@ const renderMenuItem = (item: MenuItem, active: boolean) => {
         <Link
           href={item.url}
           className={cn(
-            "group relative inline-flex h-10 w-max items-center justify-center gap-1.5 rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors",
-            active ? "text-white" : "text-white/70 hover:text-[#F5C518]",
+            "relative inline-flex h-8 w-max items-center justify-center gap-1.5 rounded-full px-4 text-sm font-medium transition-all duration-200",
+            active
+              ? "bg-yellow-400 text-gray-900 shadow-sm"
+              : "text-white/70 hover:text-white hover:bg-white/[0.06]",
           )}
         >
           <Icon className="size-4" />
           {item.title}
-          <span
-            className={cn(
-              "pointer-events-none absolute left-4 right-4 -bottom-0.5 h-[2px] origin-left bg-[#E23636] transition-transform duration-200",
-              active
-                ? "scale-x-100"
-                : "scale-x-0 group-hover:scale-x-100 group-hover:bg-white/30",
-            )}
-          />
         </Link>
       </NavigationMenuLink>
     </NavigationMenuItem>
@@ -380,12 +419,18 @@ const renderMobileMenuItem = (item: MenuItem, active: boolean) => {
 
   if (item.items) {
     return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold text-white hover:no-underline hover:text-[#F5C518] gap-2">
-          <Icon className="size-4" />
-          {item.title}
+      <AccordionItem
+        key={item.title}
+        value={item.title}
+        className="border-b-0 rounded-xl px-3 hover:bg-white/[0.03]"
+      >
+        <AccordionTrigger className="text-sm py-3 font-semibold text-white hover:no-underline hover:text-yellow-400 gap-2.5">
+          <span className="flex items-center gap-2.5">
+            <Icon className="size-4" />
+            {item.title}
+          </span>
         </AccordionTrigger>
-        <AccordionContent className="mt-2">
+        <AccordionContent className="mt-1 pb-2">
           {item.items.map((subItem) => (
             <SubMenuLink key={subItem.title} item={subItem} />
           ))}
@@ -399,14 +444,17 @@ const renderMobileMenuItem = (item: MenuItem, active: boolean) => {
       key={item.title}
       href={item.url}
       className={cn(
-        "flex items-center gap-2 text-md font-semibold transition-colors border-l-2 pl-3 -ml-3.5",
+        "flex items-center justify-between gap-2.5 rounded-xl px-3 py-3 text-sm font-semibold transition-colors",
         active
-          ? "text-white border-[#E23636]"
-          : "text-white/70 border-transparent hover:text-[#F5C518]",
+          ? "bg-yellow-400/10 text-yellow-400"
+          : "text-white/70 hover:bg-white/[0.03] hover:text-white",
       )}
     >
-      <Icon className="size-4" />
-      {item.title}
+      <span className="flex items-center gap-2.5">
+        <Icon className="size-4" />
+        {item.title}
+      </span>
+      <ChevronRight className="size-3.5 opacity-40" />
     </Link>
   );
 };
@@ -414,10 +462,10 @@ const renderMobileMenuItem = (item: MenuItem, active: boolean) => {
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
     <Link
-      className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-white/5"
+      className="flex min-w-80 flex-row gap-4 rounded-lg p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-white/[0.06]"
       href={item.url}
     >
-      <div className="text-[#F5C518]">{item.icon}</div>
+      <div className="text-yellow-400">{item.icon}</div>
       <div>
         <div className="text-sm font-semibold text-white">{item.title}</div>
         {item.description && (

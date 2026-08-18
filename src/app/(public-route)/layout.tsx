@@ -6,7 +6,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="p-6 ">
+    <div>
       <Navbar1></Navbar1>
 
       {children}

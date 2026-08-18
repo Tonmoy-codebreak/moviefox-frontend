@@ -62,7 +62,6 @@ export default function MediaContainer({
   const [sortBy, setSortBy] = useState(currentSortBy);
   const [sortOrder, setSortOrder] = useState(currentSortOrder);
 
-  // ইউআরএল বা প্যারামিটার পরিবর্তনের সাথে সাথে ডেটা ফেচ করার লজিক
   const loadMedia = async (
     search: string,
     sort: string,
@@ -84,7 +83,6 @@ export default function MediaContainer({
     });
   };
 
-  // সার্চ বারে টাইপ করার সময় ডিবাউন্স করে ডেটা আপডেট করা
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
@@ -124,7 +122,6 @@ export default function MediaContainer({
     loadMedia(searchTerm, sortBy, sortOrder, newPage.toString());
   };
 
-  // পেজিনেশন বাটনে কোন পেজ নম্বরগুলো দেখানো হবে তা ঠিক করার জন্য (শুধুই ইউআই রেন্ডারিং, কোনো ফেচ/লজিক নেই)
   const getPageNumbers = () => {
     const pages: (number | "ellipsis")[] = [];
     const { page, totalPages } = meta;

@@ -36,9 +36,7 @@ export default async function MediaPage({ searchParams }: PageProps) {
           <span className="inline-block text-xs font-bold uppercase tracking-[0.12em] text-[#E5B84B] mb-2">
             Browse
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F5F5F2] tracking-tight">
-            Media library
-          </h1>
+
           <p className="text-sm text-[#8D96A3] mt-2">
             {meta.total} {meta.total === 1 ? "title" : "titles"} available to
             explore

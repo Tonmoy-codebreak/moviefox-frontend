@@ -63,7 +63,7 @@ export default function AddToWatchlist({ mediaId }: AddToWatchlistProps) {
             ? "Adding..."
             : isSuccess
               ? "In Watchlist ✓"
-              : "Add to Watchlist 🔖"}
+              : "Add to Watchlist "}
       </button>
       {message && (
         <p

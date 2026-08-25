@@ -93,8 +93,8 @@ export default async function CompletedPage() {
                 No completed titles yet
               </p>
               <p className="text-gray-500 text-sm max-w-xs mx-auto">
-                Finish watching something and it'll land here as part of your
-                history.
+                Finish watching something and it&apos;ll land here as part of
+                your history.
               </p>
             </div>
             <Link

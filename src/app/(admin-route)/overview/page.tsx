@@ -1,7 +1,12 @@
+import AdminOverview from "@/components/modules/adminComponents/AdminOverview";
 import React from "react";
 
 const OverviewPage = () => {
-  return <div>OverviewPage</div>;
+  return (
+    <div>
+      <AdminOverview />
+    </div>
+  );
 };
 
 export default OverviewPage;

@@ -4,10 +4,11 @@ import axios from "axios";
 import { cookies } from "next/headers";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api/v1";
 
 const serverAPI = axios.create({
   baseURL: BASE_URL,
+  timeout: 8000, // 👈 ADD THIS LINE
 });
 
 export async function getAllGenresAction() {
@@ -20,7 +21,11 @@ export async function getAllGenresAction() {
       headers.Authorization = `Bearer ${token}`;
     }
 
+    console.log("Fetching genres from:", BASE_URL); // 👈 ADD THIS LINE
+
     const response = await serverAPI.get("/genre", { headers });
+
+    console.log("Genres fetched successfully"); // 👈 ADD THIS LINE
 
     return {
       success: true,

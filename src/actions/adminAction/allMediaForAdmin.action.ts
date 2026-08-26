@@ -27,7 +27,6 @@ export async function getAdminAllMedia(params: {
       sortOrder,
     });
 
-    // 👈 এখানে /getAllmedia বাদ দিয়ে শুধু /media রাখতে হবে, যেমনটি আপনার কাজ করা ফাইলে আছে
     const res = await fetch(`${BASE_URL}/media?${queryParams.toString()}`, {
       cache: "no-store",
     });

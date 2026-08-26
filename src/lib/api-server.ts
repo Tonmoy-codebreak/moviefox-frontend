@@ -1,4 +1,3 @@
-// lib/api-server.ts
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -10,15 +9,13 @@ const serverAPI = axios.create({
 });
 
 export const getWithAuth = async (endpoint: string) => {
-  // 1. Get the cookies from the request context
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value; // Ensure this matches your cookie name
+  const token = cookieStore.get("token")?.value;
 
   if (!token) {
     throw new Error("No authentication token found");
   }
 
-  // 2. Perform the request with the Authorization header
   try {
     const response = await serverAPI.get(endpoint, {
       headers: {
@@ -36,5 +33,37 @@ export const getWithAuth = async (endpoint: string) => {
       console.error(`API Error [${endpoint}]:`, error);
     }
     throw error;
+  }
+};
+
+export const postWithAuth = async (
+  endpoint: string,
+  payload: Record<string, unknown>,
+) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  try {
+    const response = await serverAPI.post(endpoint, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        `API Error [POST ${endpoint}]:`,
+        error.response?.data || error.message,
+      );
+      throw error.response?.data || error;
+    } else {
+      console.error(`API Error [POST ${endpoint}]:`, error);
+      throw error;
+    }
   }
 };

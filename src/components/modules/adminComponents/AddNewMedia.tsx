@@ -85,7 +85,17 @@ const AddNewMedia = ({ allGenres }: Props) => {
 
     const payload = {
       ...formData,
-      releaseYear: formData.releaseYear ? Number(formData.releaseYear) : null,
+      releaseYear: formData.releaseYear
+        ? Number(formData.releaseYear)
+        : undefined,
+      description:
+        formData.description.trim() === "" ? undefined : formData.description,
+      posterUrl:
+        formData.posterUrl.trim() === "" ? undefined : formData.posterUrl,
+      trailerUrl:
+        formData.trailerUrl.trim() === "" ? undefined : formData.trailerUrl,
+      streamingUrl:
+        formData.streamingUrl.trim() === "" ? undefined : formData.streamingUrl,
     };
 
     const res = await addNewMediaAction(payload);
@@ -106,54 +116,44 @@ const AddNewMedia = ({ allGenres }: Props) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 border rounded-2xl shadow-sm space-y-6 max-w-4xl mx-auto"
+      style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}
     >
-      <h1 className="text-2xl font-bold text-gray-900 border-b pb-4">
-        Add New Media
-      </h1>
+      <h1>Add New Media</h1>
 
       {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl">
-          {errorMsg}
-        </div>
+        <div style={{ color: "red", marginBottom: "10px" }}>{errorMsg}</div>
       )}
       {successMsg && (
-        <div className="p-3 bg-green-50 text-green-600 text-sm rounded-xl">
-          {successMsg}
-        </div>
+        <div style={{ color: "green", marginBottom: "10px" }}>{successMsg}</div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Title
-          </label>
+          <label style={{ display: "block", marginBottom: "5px" }}>Title</label>
           <input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
             required
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Slug
-          </label>
+          <label style={{ display: "block", marginBottom: "5px" }}>Slug</label>
           <input
             type="text"
             name="slug"
             value={formData.slug}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
             required
           />
         </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+        <div>
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Description
           </label>
           <textarea
@@ -161,20 +161,29 @@ const AddNewMedia = ({ allGenres }: Props) => {
             rows={4}
             value={formData.description}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
             placeholder="Write media description..."
           />
         </div>
 
         {/* জেনার সার্চ ও ট্যাগ সিস্টেম */}
-        <div className="md:col-span-2 space-y-3 relative">
-          <label className="block text-xs font-semibold uppercase text-gray-500">
+        <div style={{ position: "relative" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Genres
           </label>
-
-          <div className="flex flex-wrap gap-2 min-h-[42px] p-2 border rounded-xl bg-gray-50/50">
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "5px",
+              minHeight: "40px",
+              padding: "5px",
+              border: "1px solid #ccc",
+              marginBottom: "5px",
+            }}
+          >
             {formData.genreIds.length === 0 ? (
-              <span className="text-xs text-gray-400 self-center px-2">
+              <span style={{ color: "#888", fontSize: "14px" }}>
                 No genres selected yet. Search below to add.
               </span>
             ) : (
@@ -184,13 +193,25 @@ const AddNewMedia = ({ allGenres }: Props) => {
                 return (
                   <span
                     key={genreObj.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-medium rounded-lg"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      padding: "3px 8px",
+                      background: "#eee",
+                      borderRadius: "4px",
+                    }}
                   >
                     {genreObj.name}
                     <button
                       type="button"
                       onClick={() => handleRemoveGenre(genreObj.id)}
-                      className="text-indigo-500 hover:text-red-600 hover:bg-indigo-100 rounded-full p-0.5 transition-colors cursor-pointer"
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                      }}
                     >
                       ✕
                     </button>
@@ -200,7 +221,7 @@ const AddNewMedia = ({ allGenres }: Props) => {
             )}
           </div>
 
-          <div className="relative">
+          <div style={{ position: "relative" }}>
             <input
               type="text"
               placeholder="Type to search & add genres..."
@@ -210,13 +231,23 @@ const AddNewMedia = ({ allGenres }: Props) => {
                 setIsDropdownOpen(true);
               }}
               onFocus={() => setIsDropdownOpen(true)}
-              className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600 bg-white"
+              style={{ width: "100%", padding: "8px" }}
             />
 
             {isDropdownOpen && genreSearch.trim() !== "" && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+              <div
+                style={{
+                  position: "absolute",
+                  zIndex: 10,
+                  width: "100%",
+                  background: "white",
+                  border: "1px solid #ccc",
+                  maxHeight: "150px",
+                  overflowY: "auto",
+                }}
+              >
                 {filteredGenres.length === 0 ? (
-                  <div className="p-3 text-xs text-gray-400 text-center">
+                  <div style={{ padding: "8px", color: "#888" }}>
                     No matching genres found.
                   </div>
                 ) : (
@@ -224,7 +255,11 @@ const AddNewMedia = ({ allGenres }: Props) => {
                     <div
                       key={genre.id}
                       onClick={() => handleAddGenre(genre.id)}
-                      className="px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer transition-colors border-b border-gray-50 last:border-none"
+                      style={{
+                        padding: "8px",
+                        cursor: "pointer",
+                        borderBottom: "1px solid #eee",
+                      }}
                     >
                       {genre.name}
                     </div>
@@ -236,14 +271,12 @@ const AddNewMedia = ({ allGenres }: Props) => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-            Type
-          </label>
+          <label style={{ display: "block", marginBottom: "5px" }}>Type</label>
           <select
             name="type"
             value={formData.type}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600 bg-white"
+            style={{ width: "100%", padding: "8px" }}
           >
             <option value="MOVIE">MOVIE</option>
             <option value="SERIES">SERIES</option>
@@ -251,14 +284,14 @@ const AddNewMedia = ({ allGenres }: Props) => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Access
           </label>
           <select
             name="access"
             value={formData.access}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600 bg-white"
+            style={{ width: "100%", padding: "8px" }}
           >
             <option value="FREE">FREE</option>
             <option value="PREMIUM">PREMIUM</option>
@@ -266,7 +299,7 @@ const AddNewMedia = ({ allGenres }: Props) => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Release Year
           </label>
           <input
@@ -274,12 +307,12 @@ const AddNewMedia = ({ allGenres }: Props) => {
             name="releaseYear"
             value={formData.releaseYear}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Poster URL
           </label>
           <input
@@ -287,12 +320,12 @@ const AddNewMedia = ({ allGenres }: Props) => {
             name="posterUrl"
             value={formData.posterUrl}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Trailer URL
           </label>
           <input
@@ -300,12 +333,12 @@ const AddNewMedia = ({ allGenres }: Props) => {
             name="trailerUrl"
             value={formData.trailerUrl}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
+          <label style={{ display: "block", marginBottom: "5px" }}>
             Streaming URL
           </label>
           <input
@@ -313,50 +346,69 @@ const AddNewMedia = ({ allGenres }: Props) => {
             name="streamingUrl"
             value={formData.streamingUrl}
             onChange={handleChange}
-            className="w-full p-3 border rounded-xl text-sm focus:outline-indigo-600"
+            style={{ width: "100%", padding: "8px" }}
           />
         </div>
-      </div>
 
-      <div className="flex gap-6 pt-4 border-t">
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-          <input
-            type="checkbox"
-            name="isPublished"
-            checked={formData.isPublished}
-            onChange={handleChange}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          Is Published
-        </label>
+        <div style={{ display: "flex", gap: "20px" }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              name="isPublished"
+              checked={formData.isPublished}
+              onChange={handleChange}
+            />
+            Is Published
+          </label>
 
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-          <input
-            type="checkbox"
-            name="isFeatured"
-            checked={formData.isFeatured}
-            onChange={handleChange}
-            className="w-4 h-4 accent-indigo-600"
-          />
-          Is Featured
-        </label>
-      </div>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              name="isFeatured"
+              checked={formData.isFeatured}
+              onChange={handleChange}
+            />
+            Is Featured
+          </label>
+        </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-medium transition-colors cursor-pointer"
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+            marginTop: "10px",
+          }}
         >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
-        >
-          {loading ? "Creating..." : "Create Media"}
-        </button>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            style={{ padding: "8px 15px", cursor: "pointer" }}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ padding: "8px 15px", cursor: "pointer" }}
+          >
+            {loading ? "Creating..." : "Create Media"}
+          </button>
+        </div>
       </div>
     </form>
   );

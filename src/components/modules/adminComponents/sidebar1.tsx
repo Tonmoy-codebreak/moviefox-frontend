@@ -164,7 +164,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
                   )}
                 >
-                  <Link href={sidebarData.topItem.href}>
+                  <Link href={sidebarData.topItem.href} prefetch={false}>
                     <TopIcon
                       className={cn(
                         sidebarData.topItem.isActive
@@ -203,6 +203,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                       >
                         <Link
                           href={item.href}
+                          prefetch={false}
                           className="flex items-center justify-between w-full"
                         >
                           <span className="flex items-center gap-2">
@@ -235,7 +236,6 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               {sidebarData.footerItems.map((item) => {
                 const Icon = item.icon;
 
-                // যদি আইটেমটি "Log out" হয়, তবে লিঙ্কের বদলে বাটন দিয়ে হ্যান্ডেল করব
                 if (item.label === "Log out") {
                   return (
                     <SidebarMenuItem key={item.label}>
@@ -259,7 +259,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                       asChild
                       className="rounded-xl font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} prefetch={false}>
                         <Icon className="size-4 text-gray-400" />
                         <span>{item.label}</span>
                       </Link>

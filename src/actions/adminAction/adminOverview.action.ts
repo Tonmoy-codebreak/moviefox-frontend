@@ -1,5 +1,7 @@
 "use server";
 
+import { getWithAuth } from "@/lib/api-server";
+
 export interface OverviewStatsData {
   users: {
     total: number;
@@ -22,37 +24,34 @@ export interface ActionResponse {
 
 export const getAdminOverviewAction = async (): Promise<ActionResponse> => {
   try {
-    const response = await fetch(
-      "http://localhost:5000/api/admin/overview-stats",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: result.message || "Failed to fetch overview stats",
-      };
-    }
+    const result = await getWithAuth("/media/overview-stats");
 
     return {
       success: true,
+
       data: result.data,
     };
   } catch (error: unknown) {
+    const responseMessage =
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof error.response === "object" &&
+      error.response !== null &&
+      "data" in error.response &&
+      typeof error.response.data === "object" &&
+      error.response.data !== null &&
+      "message" in error.response.data &&
+      typeof error.response.data.message === "string"
+        ? error.response.data.message
+        : undefined;
+
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : "Something went wrong fetching stats!",
+        responseMessage ||
+        (error instanceof Error ? error.message : undefined) ||
+        "Something went wrong fetching stats!",
     };
   }
 };

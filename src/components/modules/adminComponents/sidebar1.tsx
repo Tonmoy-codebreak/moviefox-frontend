@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Breadcrumb,
@@ -136,6 +137,7 @@ const SidebarLogo = ({ logo }: { logo: SidebarData["logo"] }) => {
 };
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const pathname = usePathname();
   const TopIcon = sidebarData.topItem.icon;
   const { logout } = useAuth();
 
@@ -156,10 +158,10 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={sidebarData.topItem.isActive}
+                  isActive={pathname === sidebarData.topItem.href}
                   className={cn(
                     "rounded-xl font-medium transition-all",
-                    sidebarData.topItem.isActive
+                    pathname === sidebarData.topItem.href
                       ? "bg-yellow-400 text-gray-900 hover:bg-yellow-400 hover:text-gray-900 shadow-sm"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
                   )}
@@ -167,7 +169,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                   <Link href={sidebarData.topItem.href} prefetch={false}>
                     <TopIcon
                       className={cn(
-                        sidebarData.topItem.isActive
+                        pathname === sidebarData.topItem.href
                           ? "text-gray-900"
                           : "text-gray-400",
                       )}
@@ -189,14 +191,15 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               <SidebarMenu className="gap-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
+                  const isItemActive = pathname === item.href;
                   return (
                     <SidebarMenuItem key={item.label}>
                       <SidebarMenuButton
                         asChild
-                        isActive={item.isActive}
+                        isActive={isItemActive}
                         className={cn(
                           "group rounded-xl font-medium transition-all",
-                          item.isActive
+                          isItemActive
                             ? "bg-yellow-400 text-gray-900 hover:bg-yellow-400 hover:text-gray-900 shadow-sm"
                             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
                         )}
@@ -210,7 +213,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                             <Icon
                               className={cn(
                                 "size-4",
-                                item.isActive
+                                isItemActive
                                   ? "text-gray-900"
                                   : "text-gray-400 group-hover:text-gray-600",
                               )}
@@ -253,11 +256,18 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                   );
                 }
 
+                const isFooterActive = pathname === item.href;
+
                 return (
                   <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton
                       asChild
-                      className="rounded-xl font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                      isActive={isFooterActive}
+                      className={cn(
+                        "rounded-xl font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
+                        isFooterActive &&
+                          "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white",
+                      )}
                     >
                       <Link href={item.href} prefetch={false}>
                         <Icon className="size-4 text-gray-400" />
@@ -282,6 +292,26 @@ interface Sidebar1Props {
 }
 
 const Sidebar1 = ({ className, children }: Sidebar1Props) => {
+  const pathname = usePathname();
+
+  // বর্তমান রুটের উপর ভিত্তি করে পেজের নাম খুঁজে বের করা
+  const getPageTitle = () => {
+    if (pathname === sidebarData.topItem.href) return sidebarData.topItem.label;
+
+    for (const group of sidebarData.navGroups) {
+      const found = group.items.find((item) => item.href === pathname);
+      if (found) return found.label;
+    }
+
+    const foundFooter = sidebarData.footerItems.find(
+      (item) => item.href === pathname,
+    );
+    if (foundFooter) return foundFooter.label;
+
+    // যদি কোনোটার সাথে হুবহু না মিলে, তবে পাথ থেকে স্লাশ বাদ দিয়ে সুন্দর করে দেখাতে পারেন
+    return pathname.replace("/", "").toUpperCase() || "Dashboard";
+  };
+
   return (
     <TooltipProvider>
       <SidebarProvider className={cn(className)}>
@@ -297,16 +327,16 @@ const Sidebar1 = ({ className, children }: Sidebar1Props) => {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink
-                    href="#"
+                    href="/overview"
                     className="text-gray-400 hover:text-gray-800 transition-colors"
                   >
-                    Overview
+                    Home
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block text-gray-300" />
                 <BreadcrumbItem>
                   <BreadcrumbPage className="font-semibold text-gray-800 dark:text-white">
-                    lolboard
+                    {getPageTitle()}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>

@@ -16,15 +16,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -117,18 +108,12 @@ const SidebarLogo = ({ logo }: { logo: SidebarData["logo"] }) => {
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton size="lg" className="hover:bg-transparent">
-          <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-yellow-400 shadow-sm">
-            <img
-              src={logo.src}
-              alt={logo.alt}
-              className="size-5 text-gray-900"
-            />
+          <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-[#F5C518] shadow-sm">
+            <img src={logo.src} alt={logo.alt} className="size-5" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
-            <span className="font-bold text-gray-800 dark:text-white">
-              {logo.title}
-            </span>
-            <span className="text-xs text-gray-400">{logo.description}</span>
+            <span className="font-bold text-white">{logo.title}</span>
+            <span className="text-xs text-white/40">{logo.description}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -142,15 +127,12 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { logout } = useAuth();
 
   return (
-    <Sidebar
-      {...props}
-      className="border-r border-gray-200 dark:border-gray-800"
-    >
-      <SidebarHeader className="border-b border-gray-100 dark:border-gray-800 pb-3">
+    <Sidebar {...props} className="border-r border-white/10 bg-black">
+      <SidebarHeader className="border-b border-white/10 pb-3 bg-black">
         <SidebarLogo logo={sidebarData.logo} />
       </SidebarHeader>
 
-      <SidebarContent className="px-1">
+      <SidebarContent className="px-1 bg-black">
         {/* Top-level Overview item, outside any group */}
         <SidebarGroup className="pb-1">
           <SidebarGroupContent>
@@ -162,16 +144,16 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                   className={cn(
                     "rounded-xl font-medium transition-all",
                     pathname === sidebarData.topItem.href
-                      ? "bg-yellow-400 text-gray-900 hover:bg-yellow-400 hover:text-gray-900 shadow-sm"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
+                      ? "bg-[#F5C518] text-black hover:bg-[#F5C518] hover:text-black shadow-sm"
+                      : "text-white/60 hover:bg-white/5 hover:text-white",
                   )}
                 >
                   <Link href={sidebarData.topItem.href} prefetch={false}>
                     <TopIcon
                       className={cn(
                         pathname === sidebarData.topItem.href
-                          ? "text-gray-900"
-                          : "text-gray-400",
+                          ? "text-black"
+                          : "text-white/30",
                       )}
                     />
                     <span>{sidebarData.topItem.label}</span>
@@ -184,7 +166,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 
         {sidebarData.navGroups.map((group) => (
           <SidebarGroup key={group.title} className="pt-2">
-            <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2">
+            <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-wider text-white/30 px-2">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -200,8 +182,8 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                         className={cn(
                           "group rounded-xl font-medium transition-all",
                           isItemActive
-                            ? "bg-yellow-400 text-gray-900 hover:bg-yellow-400 hover:text-gray-900 shadow-sm"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
+                            ? "bg-[#F5C518] text-black hover:bg-[#F5C518] hover:text-black shadow-sm"
+                            : "text-white/60 hover:bg-white/5 hover:text-white",
                         )}
                       >
                         <Link
@@ -214,13 +196,18 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                               className={cn(
                                 "size-4",
                                 isItemActive
-                                  ? "text-gray-900"
-                                  : "text-gray-400 group-hover:text-gray-600",
+                                  ? "text-black"
+                                  : "text-white/30 group-hover:text-white/70",
                               )}
                             />
                             <span>{item.label}</span>
                           </span>
-                          <ChevronRight className="size-3.5 text-gray-300 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                          <ChevronRight
+                            className={cn(
+                              "size-3.5 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0",
+                              isItemActive ? "text-black/40" : "text-white/20",
+                            )}
+                          />
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -232,7 +219,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
         ))}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-gray-100 dark:border-gray-800 pt-3">
+      <SidebarFooter className="border-t border-white/10 pt-3 bg-black">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
@@ -247,7 +234,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                           logout();
                           window.location.href = "/login";
                         }}
-                        className="cursor-pointer rounded-xl font-medium text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                        className="cursor-pointer rounded-xl font-medium text-[#E23636] hover:bg-[#E23636]/10 hover:text-[#ff5252]"
                       >
                         <Icon className="size-4" />
                         <span>{item.label}</span>
@@ -264,13 +251,12 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                       asChild
                       isActive={isFooterActive}
                       className={cn(
-                        "rounded-xl font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800",
-                        isFooterActive &&
-                          "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white",
+                        "rounded-xl font-medium text-white/60 hover:bg-white/5 hover:text-white",
+                        isFooterActive && "bg-white/10 text-white",
                       )}
                     >
                       <Link href={item.href} prefetch={false}>
-                        <Icon className="size-4 text-gray-400" />
+                        <Icon className="size-4 text-white/30" />
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -292,64 +278,16 @@ interface Sidebar1Props {
 }
 
 const Sidebar1 = ({ className, children }: Sidebar1Props) => {
-  const pathname = usePathname();
-
-  // বর্তমান রুটের উপর ভিত্তি করে পেজের নাম খুঁজে বের করা
-  const getPageTitle = () => {
-    if (pathname === sidebarData.topItem.href) return sidebarData.topItem.label;
-
-    for (const group of sidebarData.navGroups) {
-      const found = group.items.find((item) => item.href === pathname);
-      if (found) return found.label;
-    }
-
-    const foundFooter = sidebarData.footerItems.find(
-      (item) => item.href === pathname,
-    );
-    if (foundFooter) return foundFooter.label;
-
-    // যদি কোনোটার সাথে হুবহু না মিলে, তবে পাথ থেকে স্লাশ বাদ দিয়ে সুন্দর করে দেখাতে পারেন
-    return pathname.replace("/", "").toUpperCase() || "Dashboard";
-  };
-
   return (
     <TooltipProvider>
       <SidebarProvider className={cn(className)}>
         <AppSidebar />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm sticky top-0 z-10">
-            <SidebarTrigger className="-ml-1 rounded-lg hover:bg-yellow-100 hover:text-gray-900 dark:hover:bg-gray-800" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink
-                    href="/overview"
-                    className="text-gray-400 hover:text-gray-800 transition-colors"
-                  >
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block text-gray-300" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="font-semibold text-gray-800 dark:text-white">
-                    {getPageTitle()}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            <div className="ml-auto flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-400/10 border border-yellow-200 dark:border-yellow-400/30 px-3 py-1 text-xs font-semibold text-yellow-700 dark:text-yellow-400">
-                <ShieldCheck className="size-3.5" />
-                Admin
-              </span>
-            </div>
-          </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 bg-gray-50/50 dark:bg-gray-950">
+          {/* Minimal trigger only — no breadcrumb bar */}
+          <div className="sticky top-0 z-10 flex items-center px-4 py-3 bg-black">
+            <SidebarTrigger className="rounded-lg text-white/50 hover:bg-[#F5C518]/10 hover:text-[#F5C518]" />
+          </div>
+          <div className="flex flex-1 flex-col gap-4 px-4 pb-4 bg-black min-h-screen">
             {children}
           </div>
         </SidebarInset>

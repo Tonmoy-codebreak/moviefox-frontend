@@ -1,45 +1,26 @@
-import MediaContainer from "@/components/modules/publicComponents/MediaContainer";
-import { fetchMediaAction } from "@/actions/publicAction/mediaContainer.action";
+import HomePageBanner from "@/components/modules/publicComponents/HomePageBanner";
+import React from "react";
 
-interface PageProps {
-  searchParams: Promise<{
-    page?: string;
-    searchTerm?: string;
-    sortBy?: string;
-    sortOrder?: string;
-  }>;
-}
-
-export default async function HomePage({ searchParams }: PageProps) {
-  const resolvedParams = await searchParams;
-  const page = resolvedParams.page || "1";
-  const searchTerm = resolvedParams.searchTerm || "";
-  const sortBy = resolvedParams.sortBy || "createdAt";
-  const sortOrder = resolvedParams.sortOrder || "desc";
-
-  const response = await fetchMediaAction({
-    page,
-    searchTerm,
-    sortBy,
-    sortOrder,
-  });
-
-  const movies = response.success ? response.data : [];
-  const meta = response.success
-    ? response.meta
-    : { page: 1, limit: 8, total: 0, totalPages: 1 };
-
+const HomePage = () => {
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Media Library</h1>
+    <main className="min-h-screen bg-slate-950 text-white">
+      {/* Hero Banner Section */}
+      <HomePageBanner />
 
-      <MediaContainer
-        initialMovies={movies}
-        initialMeta={meta}
-        currentSearch={searchTerm}
-        currentSortBy={sortBy}
-        currentSortOrder={sortOrder}
-      />
-    </div>
+      {/* Additional Page Sections Can Go Here */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold tracking-tight mb-4">
+            Welcome to Our Platform
+          </h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Explore our curated features and see how we can help you build
+            extraordinary digital experiences.
+          </p>
+        </div>
+      </section>
+    </main>
   );
-}
+};
+
+export default HomePage;

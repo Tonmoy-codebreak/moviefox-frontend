@@ -8,6 +8,8 @@ import {
   ArrowRight,
   Film,
   Sparkles,
+  ChevronDown,
+  PlayCircle,
 } from "lucide-react";
 import RemoveFromWatchlist from "@/components/modules/userComponents/RemoveFromWatchlist";
 
@@ -38,11 +40,10 @@ export default async function WatchlistPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      <div className="container mx-auto p-6 max-w-6xl space-y-8">
+    <main className="min-h-screen bg-black">
+      <div className="container mx-auto p-6 max-w-5xl space-y-8">
         {/* Header */}
-        <div className="relative overflow-hidden bg-black rounded-2xl px-7 py-9">
-          {/* Decorative accent */}
+        <div className="relative overflow-hidden bg-white/[0.03] border border-white/10 rounded-2xl px-7 py-9">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#E23636]/10 rounded-full blur-2xl" />
           <div className="absolute bottom-0 left-1/3 w-56 h-56 bg-[#F5C518]/5 rounded-full blur-3xl" />
 
@@ -75,22 +76,22 @@ export default async function WatchlistPage() {
         </div>
 
         {watchlist.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 space-y-5">
-            <div className="mx-auto h-16 w-16 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <Bookmark className="size-7 text-gray-400" />
+          <div className="text-center py-24 bg-white/[0.03] border border-white/10 rounded-2xl space-y-5">
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-white/5 flex items-center justify-center">
+              <Bookmark className="size-7 text-white/30" />
             </div>
             <div className="space-y-1.5">
-              <p className="text-gray-900 font-bold text-xl">
+              <p className="text-white font-bold text-xl">
                 Your watchlist is empty
               </p>
-              <p className="text-gray-500 text-sm max-w-xs mx-auto">
+              <p className="text-white/40 text-sm max-w-xs mx-auto">
                 Save titles you&apos;re excited about and they&apos;ll show up
                 right here, ready when you are.
               </p>
             </div>
             <Link
               href="/media"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-black hover:bg-[#E23636] text-white font-semibold rounded-lg transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#E23636] hover:bg-[#c92c2c] text-white font-semibold rounded-lg transition-colors text-sm"
             >
               <Sparkles className="size-4 text-[#F5C518]" />
               Explore media
@@ -98,67 +99,89 @@ export default async function WatchlistPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {watchlist.map((item) => (
+          /* Ranked list — CSS-only expand/collapse per row, no JS needed */
+          <div className="space-y-3">
+            {watchlist.map((item, index) => (
               <div
                 key={item.id}
-                className="group bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#E23636]/40 hover:shadow-xl hover:-translate-y-1"
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] hover:border-[#F5C518]/30 transition-colors"
               >
-                <div>
-                  <div className="relative w-full h-72 bg-gray-100 overflow-hidden">
+                {/* Giant ghost rank number */}
+                <span className="pointer-events-none select-none absolute -left-2 top-1/2 -translate-y-1/2 text-[6rem] sm:text-[7rem] font-black leading-none text-white/[0.04] italic">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <input
+                  type="checkbox"
+                  id={`expand-${item.id}`}
+                  className="peer sr-only"
+                />
+
+                <label
+                  htmlFor={`expand-${item.id}`}
+                  className="relative z-10 flex items-center gap-4 sm:gap-5 p-3 sm:p-4 cursor-pointer select-none"
+                >
+                  {/* Poster thumbnail */}
+                  <div className="relative w-16 h-24 sm:w-20 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-white/5 shadow-lg">
                     {item.media.posterUrl ? (
                       <img
                         src={item.media.posterUrl}
                         alt={item.media.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gray-100 text-gray-300">
-                        <Film className="size-8" />
-                        <span className="text-xs font-medium">No poster</span>
+                      <div className="w-full h-full flex items-center justify-center text-white/20">
+                        <Film className="size-6" />
                       </div>
                     )}
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {typeof item.media.avgRating === "number" && (
-                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/80 backdrop-blur px-2.5 py-1 shadow-sm">
-                        <Star className="size-3 fill-[#F5C518] text-[#F5C518]" />
-                        <span className="text-[11px] font-bold text-white">
-                          {item.media.avgRating.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-
-                    {item.media.type && (
-                      <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-white/90 text-black shadow-sm">
-                        {item.media.type}
-                      </span>
-                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <PlayCircle className="size-6 text-white/90" />
+                    </div>
                   </div>
 
-                  <div className="p-4 pb-2">
-                    <h2 className="font-bold text-base text-gray-900 line-clamp-1">
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-bold text-white text-base sm:text-lg line-clamp-1 group-hover:text-[#F5C518] transition-colors">
                       {item.media.title}
                     </h2>
-                    <span className="flex items-center gap-1.5 text-xs text-gray-400 mt-1.5">
-                      <Calendar className="size-3" />
-                      {item.media.releaseYear}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
+                      <span className="flex items-center gap-1 text-xs text-white/40">
+                        <Calendar className="size-3" />
+                        {item.media.releaseYear}
+                      </span>
+                      {item.media.type && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-white/10 text-white/70">
+                          {item.media.type}
+                        </span>
+                      )}
+                      {typeof item.media.avgRating === "number" && (
+                        <span className="flex items-center gap-1 text-xs font-semibold text-white/70">
+                          <Star className="size-3 fill-[#F5C518] text-[#F5C518]" />
+                          {item.media.avgRating.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Action Buttons Footer */}
-                <div className="p-4 pt-3 border-t border-gray-100 flex items-center gap-2">
-                  <Link
-                    href={`/media/${item.media.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 text-center border border-gray-200 hover:border-black hover:bg-black hover:text-white text-gray-700 font-semibold rounded-lg transition-colors text-sm"
-                  >
-                    More
-                    <ArrowRight className="size-3.5" />
-                  </Link>
-                  <div className="flex-1">
-                    <RemoveFromWatchlist mediaId={item.media.id} />
+                  {/* Expand chevron */}
+                  <ChevronDown className="size-5 text-white/30 flex-shrink-0 transition-transform duration-300 peer-checked:rotate-180 group-hover:text-white/60" />
+                </label>
+
+                {/* Smoothly expanding action panel — CSS grid-rows trick, no JS */}
+                <div className="relative z-10 grid grid-rows-[0fr] peer-checked:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out">
+                  <div className="overflow-hidden">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 px-4 sm:px-5 pb-4 pt-1 border-t border-white/10 mx-3 sm:mx-4">
+                      <Link
+                        href={`/media/${item.media.id}`}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 text-center border border-white/15 hover:border-white/30 hover:bg-white/10 text-white/80 hover:text-white font-semibold rounded-lg transition-colors text-sm"
+                      >
+                        More details
+                        <ArrowRight className="size-3.5" />
+                      </Link>
+                      <div className="flex-1">
+                        <RemoveFromWatchlist mediaId={item.media.id} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -3,6 +3,19 @@
 import React, { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { getAllUsersAction } from "@/actions/adminAction/getAllUser.action";
+import {
+  Search,
+  Mail,
+  Users,
+  ShieldCheck,
+  Calendar,
+  ChevronRight,
+  ChevronLeft,
+  AlertCircle,
+  UserX,
+  Filter,
+  X,
+} from "lucide-react";
 
 type User = {
   id: string;
@@ -12,6 +25,27 @@ type User = {
   createdAt: string;
   updatedAt: string;
 };
+
+const AVATAR_PALETTE = [
+  "bg-[#E23636]/20 text-[#ff6b6b]",
+  "bg-[#F5C518]/20 text-[#F5C518]",
+  "bg-blue-500/20 text-blue-400",
+  "bg-emerald-500/20 text-emerald-400",
+  "bg-purple-500/20 text-purple-400",
+];
+
+const getAvatarStyle = (name: string) => {
+  const idx = name.charCodeAt(0) % AVATAR_PALETTE.length;
+  return AVATAR_PALETTE[idx];
+};
+
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
 const GetAllUser = () => {
   const router = useRouter();
@@ -24,11 +58,9 @@ const GetAllUser = () => {
     totalPages: 1,
   });
 
-  // ফিল্টার স্টেটসমূহ
   const [searchName, setSearchName] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
 
-  // আলাদা করা মাস এবং বছর ফিল্টার স্টেট
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
 
@@ -75,7 +107,6 @@ const GetAllUser = () => {
     fetchUsers("", value, 1);
   };
 
-  // ডাটা ফিল্টার করার লজিক (Tab, Month, Year এবং Search অনুযায়ী)
   const getFilteredGroups = () => {
     const filteredGroups: Record<string, User[]> = {};
 
@@ -90,12 +121,10 @@ const GetAllUser = () => {
         return;
       }
 
-      // ২. বছর ফিল্টার চেক
       if (selectedYear && groupYear !== selectedYear) {
         return;
       }
 
-      // ৩. রোল (Tab) এবং সার্চ ফিল্টার অনুযায়ী ইউজার ফিল্টার করা
       const filteredUsers = users.filter((user) => {
         const matchesTab =
           activeTab === "ALL" ||
@@ -122,7 +151,6 @@ const GetAllUser = () => {
 
   const finalGroupedData = getFilteredGroups();
 
-  // ১২ মাসের ড্রপডাউন অপশন লিস্ট
   const monthsList = [
     "January",
     "February",
@@ -138,209 +166,340 @@ const GetAllUser = () => {
     "December",
   ];
 
+  const totalVisible = Object.values(finalGroupedData).reduce(
+    (sum, arr) => sum + arr.length,
+    0,
+  );
+
+  const hasActiveFilters =
+    searchName ||
+    searchEmail ||
+    selectedMonth ||
+    selectedYear ||
+    activeTab !== "ALL";
+
+  const clearFilters = () => {
+    setSearchName("");
+    setSearchEmail("");
+    setSelectedMonth("");
+    setSelectedYear("");
+    setActiveTab("ALL");
+    fetchUsers("", "", 1);
+  };
+
   return (
-    <div className="bg-white p-6 border rounded-2xl shadow-sm space-y-6 max-w-6xl mx-auto">
+    <div className="bg-white/[0.03] border border-white/10 rounded-2xl max-w-6xl mx-auto overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">
-          All Users Management
-        </h1>
-
-        {/* Role wise user display section */}
-        <div className="flex bg-gray-100 p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab("ALL")}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === "ALL"
-                ? "bg-white shadow-sm text-indigo-600"
-                : "text-gray-600"
-            }`}
-          >
-            All Users
-          </button>
-          <button
-            onClick={() => setActiveTab("ADMIN")}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === "ADMIN"
-                ? "bg-white shadow-sm text-purple-600"
-                : "text-gray-600"
-            }`}
-          >
-            Admins
-          </button>
-          <button
-            onClick={() => setActiveTab("USER")}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === "USER"
-                ? "bg-white shadow-sm text-blue-600"
-                : "text-gray-600"
-            }`}
-          >
-            Regular Users
-          </button>
-        </div>
-      </div>
-
-      {/* Search section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Search by Name
-          </label>
-          <input
-            type="text"
-            placeholder="Type name..."
-            value={searchName}
-            onChange={handleNameSearchChange}
-            className="w-full p-2.5 border rounded-xl text-sm focus:outline-indigo-600 bg-gray-50/50"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center size-10 rounded-xl bg-[#F5C518]/15">
+            <Users className="size-5 text-[#F5C518]" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white">
+              All Users Management
+            </h1>
+            <p className="text-xs text-white/40">
+              {meta.total} total user{meta.total !== 1 ? "s" : ""} registered
+            </p>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Search by Email
-          </label>
-          <input
-            type="text"
-            placeholder="Type email..."
-            value={searchEmail}
-            onChange={handleEmailSearchChange}
-            className="w-full p-2.5 border rounded-xl text-sm focus:outline-indigo-600 bg-gray-50/50"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Filter by Month
-          </label>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="w-full p-2.5 border rounded-xl text-sm focus:outline-indigo-600 bg-gray-50/50 cursor-pointer"
-          >
-            <option value="">All Months</option>
-            {monthsList.map((month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Filter by Year
-          </label>
-          <input
-            type="number"
-            placeholder="e.g. 2026"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="w-full p-2.5 border rounded-xl text-sm focus:outline-indigo-600 bg-gray-50/50"
-          />
-        </div>
-      </div>
-
-      {errorMsg && (
-        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl">
-          {errorMsg}
-        </div>
-      )}
-
-      {isPending && (
-        <div className="text-center py-6 text-sm text-gray-500">
-          Loading users...
-        </div>
-      )}
-
-      {/* display user list */}
-      {!isPending && Object.keys(finalGroupedData).length === 0 ? (
-        <div className="text-center py-12 text-gray-400 text-sm border border-dashed rounded-xl">
-          No users match your applied filters.
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {Object.entries(finalGroupedData).map(([monthYear, users]) => (
-            <div key={monthYear} className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg inline-block">
-                {monthYear} ({users.length})
-              </h2>
-
-              <div className="overflow-x-auto border rounded-xl">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b">
-                    <tr>
-                      <th className="p-3">Name</th>
-                      <th className="p-3">Email</th>
-                      <th className="p-3">Role</th>
-                      <th className="p-3">Joined Date</th>
-                      <th className="p-3 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y text-sm text-gray-700">
-                    {users.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-gray-50/50 transition-colors"
-                      >
-                        <td className="p-3 font-medium text-gray-900">
-                          {user.name}
-                        </td>
-                        <td className="p-3 text-gray-600">{user.email}</td>
-                        <td className="p-3">
-                          <span
-                            className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                              user.role === "ADMIN"
-                                ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                : "bg-blue-50 text-blue-700 border border-blue-200"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="p-3 text-gray-500">
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="p-3 text-right">
-                          <button
-                            onClick={() => router.push(`/allusers/${user.id}`)}
-                            className="px-3 py-1.5 text-xs font-semibold bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors cursor-pointer"
-                          >
-                            Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        {/* Role segmented control */}
+        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+          {(["ALL", "ADMIN", "USER"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                activeTab === tab
+                  ? "bg-[#F5C518] text-black shadow-sm"
+                  : "text-white/50 hover:text-white"
+              }`}
+            >
+              {tab === "ALL"
+                ? "All Users"
+                : tab === "ADMIN"
+                  ? "Admins"
+                  : "Regular"}
+            </button>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Pagination section */}
-      <div className="flex justify-between items-center pt-4 border-t text-sm text-gray-600">
+      {/* Search + filter bar */}
+      <div className="p-6 border-b border-white/10 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/30" />
+            <input
+              type="text"
+              placeholder="Search by name..."
+              value={searchName}
+              onChange={handleNameSearchChange}
+              className="w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border-2 border-white/10 rounded-xl text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#E23636] focus:bg-white/[0.06] focus:ring-4 focus:ring-[#E23636]/10 transition-all"
+            />
+          </div>
+
+          <div className="relative">
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/30" />
+            <input
+              type="text"
+              placeholder="Search by email..."
+              value={searchEmail}
+              onChange={handleEmailSearchChange}
+              className="w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border-2 border-white/10 rounded-xl text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#E23636] focus:bg-white/[0.06] focus:ring-4 focus:ring-[#E23636]/10 transition-all"
+            />
+          </div>
+
+          <div className="relative">
+            <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/30 pointer-events-none" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border-2 border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#E23636] focus:bg-white/[0.06] focus:ring-4 focus:ring-[#E23636]/10 transition-all cursor-pointer appearance-none [&>option]:bg-black [&>option]:text-white"
+            >
+              <option value="">All Months</option>
+              {monthsList.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="relative">
+            <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/30" />
+            <input
+              type="number"
+              placeholder="Filter by year..."
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border-2 border-white/10 rounded-xl text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#E23636] focus:bg-white/[0.06] focus:ring-4 focus:ring-[#E23636]/10 transition-all"
+            />
+          </div>
+        </div>
+
+        {hasActiveFilters && (
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-white/40">
+              Showing{" "}
+              <span className="font-bold text-white">{totalVisible}</span>{" "}
+              matching result{totalVisible !== 1 ? "s" : ""}
+            </p>
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1.5 text-xs font-semibold text-[#F5C518] hover:text-[#ffd84d] transition-colors cursor-pointer"
+            >
+              <X className="size-3.5" />
+              Clear filters
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 space-y-6">
+        {errorMsg && (
+          <div className="flex items-center gap-2 p-3 bg-[#E23636]/10 border border-[#E23636]/30 text-[#ff6b6b] text-sm rounded-xl">
+            <AlertCircle className="size-4 flex-shrink-0" />
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Skeleton loading state */}
+        {isPending && (
+          <div className="space-y-3 animate-pulse">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/10 rounded-xl"
+              >
+                <div className="size-10 rounded-full bg-white/10 flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-1/3 bg-white/10 rounded" />
+                  <div className="h-2.5 w-1/2 bg-white/5 rounded" />
+                </div>
+                <div className="h-7 w-16 bg-white/10 rounded-lg flex-shrink-0" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!isPending && Object.keys(finalGroupedData).length === 0 && (
+          <div className="text-center py-16 border border-dashed border-white/10 rounded-2xl space-y-3">
+            <div className="mx-auto size-14 rounded-2xl bg-white/5 flex items-center justify-center">
+              <UserX className="size-6 text-white/25" />
+            </div>
+            <div>
+              <p className="text-white font-semibold">No users found</p>
+              <p className="text-white/40 text-sm mt-0.5">
+                Try adjusting your search or filters.
+              </p>
+            </div>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F5C518] hover:text-[#ffd84d] transition-colors cursor-pointer"
+              >
+                <X className="size-3.5" />
+                Clear all filters
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Grouped user list */}
+        {!isPending && Object.keys(finalGroupedData).length > 0 && (
+          <div className="space-y-8">
+            {Object.entries(finalGroupedData).map(([monthYear, users]) => (
+              <div key={monthYear} className="space-y-3">
+                <div className="flex items-center gap-2 sticky top-0 z-10 py-1">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#F5C518] bg-[#F5C518]/10 border border-[#F5C518]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5">
+                    <Calendar className="size-3" />
+                    {monthYear}
+                  </h2>
+                  <span className="text-xs text-white/30">
+                    {users.length} user{users.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-hidden border border-white/10 rounded-xl">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-white/[0.04] text-[11px] uppercase tracking-wide text-white/40 border-b border-white/10">
+                      <tr>
+                        <th className="p-3 font-semibold">User</th>
+                        <th className="p-3 font-semibold">Role</th>
+                        <th className="p-3 font-semibold">Joined</th>
+                        <th className="p-3 font-semibold text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {users.map((user) => (
+                        <tr
+                          key={user.id}
+                          className="group hover:bg-white/[0.03] transition-colors"
+                        >
+                          <td className="p-3">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`flex items-center justify-center size-9 rounded-full text-xs font-bold flex-shrink-0 ${getAvatarStyle(
+                                  user.name,
+                                )}`}
+                              >
+                                {getInitials(user.name)}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-white text-sm truncate">
+                                  {user.name}
+                                </p>
+                                <p className="text-white/40 text-xs truncate">
+                                  {user.email}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-md ${
+                                user.role === "ADMIN"
+                                  ? "bg-[#F5C518]/15 text-[#F5C518] border border-[#F5C518]/30"
+                                  : "bg-white/5 text-white/60 border border-white/10"
+                              }`}
+                            >
+                              {user.role === "ADMIN" && (
+                                <ShieldCheck className="size-3" />
+                              )}
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="p-3 text-white/50 text-sm">
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="p-3 text-right">
+                            <button
+                              onClick={() =>
+                                router.push(`/allusers/${user.id}`)
+                              }
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold bg-white/5 text-white/70 border border-white/10 rounded-lg hover:bg-[#F5C518] hover:text-black hover:border-[#F5C518] transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                            >
+                              Details
+                              <ChevronRight className="size-3" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="md:hidden space-y-2">
+                  {users.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => router.push(`/allusers/${user.id}`)}
+                      className="w-full flex items-center gap-3 p-3.5 bg-white/[0.03] border border-white/10 rounded-xl hover:bg-white/[0.05] transition-colors text-left cursor-pointer"
+                    >
+                      <div
+                        className={`flex items-center justify-center size-10 rounded-full text-xs font-bold flex-shrink-0 ${getAvatarStyle(
+                          user.name,
+                        )}`}
+                      >
+                        {getInitials(user.name)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-white text-sm truncate">
+                          {user.name}
+                        </p>
+                        <p className="text-white/40 text-xs truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 text-[10px] font-bold rounded-md flex-shrink-0 ${
+                          user.role === "ADMIN"
+                            ? "bg-[#F5C518]/15 text-[#F5C518]"
+                            : "bg-white/5 text-white/50"
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                      <ChevronRight className="size-4 text-white/20 flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 p-6 border-t border-white/10 text-sm text-white/50">
         <div>
-          Showing page <span className="font-semibold">{meta.page}</span> of{" "}
-          <span className="font-semibold">{meta.totalPages}</span> (Total
-          fetched: {meta.total})
+          Page <span className="font-bold text-white">{meta.page}</span> of{" "}
+          <span className="font-bold text-white">{meta.totalPages}</span>
+          <span className="text-white/30"> · {meta.total} total</span>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={() => fetchUsers(searchName, searchEmail, meta.page - 1)}
             disabled={meta.page <= 1 || isPending}
-            className="px-4 py-2 border rounded-xl hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+            className="flex items-center gap-1 px-4 py-2 border border-white/10 text-white/70 rounded-xl hover:bg-white/5 hover:border-white/20 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
+            <ChevronLeft className="size-3.5" />
             Previous
           </button>
           <button
             onClick={() => fetchUsers(searchName, searchEmail, meta.page + 1)}
             disabled={meta.page >= meta.totalPages || isPending}
-            className="px-4 py-2 border rounded-xl hover:bg-gray-50 disabled:opacity-40 cursor-pointer"
+            className="flex items-center gap-1 px-4 py-2 border border-white/10 text-white/70 rounded-xl hover:bg-white/5 hover:border-white/20 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
           >
             Next
+            <ChevronRight className="size-3.5" />
           </button>
         </div>
       </div>

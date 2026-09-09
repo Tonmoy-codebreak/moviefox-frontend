@@ -1,5 +1,6 @@
 import Footer from "@/components/modules/publicComponents/Footer";
 import { Navbar1 } from "@/components/modules/publicComponents/navbar1";
+import ChatBot from "@/components/modules/userComponents/ChatBot";
 
 export default function MainLayout({
   children,
@@ -7,11 +8,15 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <Navbar1></Navbar1>
+    <div className="relative min-h-screen flex flex-col">
+      <Navbar1 />
 
-      {children}
-      <Footer></Footer>
+      <main className="flex-1">{children}</main>
+
+      <Footer />
+
+      {/* এখানে ফ্লোটিং চ্যাটবট বসিয়ে দেওয়া হলো, ফলে সব পেজেই এটি শো করবে */}
+      <ChatBot />
     </div>
   );
 }

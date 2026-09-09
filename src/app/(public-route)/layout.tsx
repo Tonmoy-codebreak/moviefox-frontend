@@ -1,3 +1,4 @@
+import Footer from "@/components/modules/publicComponents/Footer";
 import { Navbar1 } from "@/components/modules/publicComponents/navbar1";
 
 export default function MainLayout({
@@ -10,6 +11,7 @@ export default function MainLayout({
       <Navbar1></Navbar1>
 
       {children}
+      <Footer></Footer>
     </div>
   );
 }
